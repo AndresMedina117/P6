@@ -1,0 +1,5184 @@
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"main.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.keyboard,"ax",%progbits
+  20              		.align	2
+  21              		.global	keyboard
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	keyboard, %function
+  25              	keyboard:
+  26              	.LFB64:
+  27              		.file 1 "main.c"
+   1:main.c        **** /* ========================================
+   2:main.c        ****  *
+   3:main.c        ****  * Copyright YOUR COMPANY, THE YEAR
+   4:main.c        ****  * All Rights Reserved
+   5:main.c        ****  * UNPUBLISHED, LICENSED SOFTWARE.
+   6:main.c        ****  *
+   7:main.c        ****  * CONFIDENTIAL AND PROPRIETARY INFORMATION
+   8:main.c        ****  * WHICH IS THE PROPERTY OF your company.
+   9:main.c        ****  *
+  10:main.c        ****  * ========================================
+  11:main.c        **** */
+  12:main.c        **** #include "project.h"
+  13:main.c        **** uint16 valpot = 0;
+  14:main.c        **** uint8 tipounidad = 0;
+  15:main.c        **** uint32 angulo = 0;
+  16:main.c        **** uint8 tecla;
+  17:main.c        **** uint8 countpot = 0;
+  18:main.c        **** uint8 potband = 0;
+  19:main.c        **** uint8 tecladoband = 0;
+  20:main.c        **** uint8 pos = 0;
+  21:main.c        **** uint8 ms1 = 0;
+  22:main.c        **** uint8 ms2=0;
+  23:main.c        **** uint8 add = 0;
+  24:main.c        **** uint8 correcto = 0;
+  25:main.c        **** uint8 ohno = 0;
+  26:main.c        **** uint8 ESCORRECTO = 0;
+  27:main.c        **** uint8 salida = 0;
+  28:main.c        **** uint32 counterOut = 0;
+  29:main.c        **** uint8 comparado = 0;
+  30:main.c        **** uint8 ciclo_acabado;
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 2
+
+
+  31:main.c        **** uint16 senal_hume=0;
+  32:main.c        **** uint16 senal_temp=0;
+  33:main.c        **** uint32 milivolt_h=0;
+  34:main.c        **** uint32 milivolt_temp=0;
+  35:main.c        **** uint8 finishpass = 0;
+  36:main.c        **** uint8 puerta_cerrada=0;
+  37:main.c        **** uint8 ClaveIngresada[4];
+  38:main.c        **** uint8 ClaveOriginal[4]={1,2,2,3};
+  39:main.c        **** uint8 CompararClave(const uint8 *Ingresada, const uint8 *Original);
+  40:main.c        **** uint16 temp;
+  41:main.c        **** uint16 humedad;
+  42:main.c        **** uint8 ingresando_valores=0;
+  43:main.c        **** uint8 temperatura_anadida=0;
+  44:main.c        **** uint8 humedad_anadida=0;
+  45:main.c        **** uint8 tiempo_anadido=0;
+  46:main.c        **** uint32 temp_in=2;
+  47:main.c        **** uint32 humedad_in=0;
+  48:main.c        **** uint32 tiempo_in=2;
+  49:main.c        **** uint8 valores_confirmados=1;
+  50:main.c        **** uint16 min_crono;
+  51:main.c        **** uint16 segundos_crono;
+  52:main.c        **** uint16 miliseg_crono;
+  53:main.c        **** uint8 iniciar_conteo;
+  54:main.c        **** uint8 mostrar_EnCilolcd;
+  55:main.c        **** uint8 sacar_adc;
+  56:main.c        **** uint16 limite_temp=120;
+  57:main.c        **** uint16 limite_hum=80;
+  58:main.c        **** uint8 alarma_temPeligro=0;
+  59:main.c        **** uint8 alarma_humPeligro=0;
+  60:main.c        **** uint8 alarma_ambasPeligro=0;
+  61:main.c        **** uint8 alarma_yapasotiempo=0;
+  62:main.c        **** uint8 encender_alarma_ambas;
+  63:main.c        **** uint16 contador_muestras=0;
+  64:main.c        **** uint8 bot1;
+  65:main.c        **** uint16 SEGUNDOS=0;
+  66:main.c        **** uint16 humedad_medida;
+  67:main.c        **** uint16 temperatura_medida;
+  68:main.c        **** RTC_TIME_DATE Start;
+  69:main.c        **** uint8 apagador_alarma=0;
+  70:main.c        **** int main(void)
+  71:main.c        **** {
+  72:main.c        ****     CyGlobalIntEnable; // Se inicializan los modulos necesarios
+  73:main.c        ****     
+  74:main.c        **** //    Start.Sec = 55;
+  75:main.c        **** //    Start.Min = 45;
+  76:main.c        **** //    Start.Hour = 23;
+  77:main.c        **** //    Start.DayOfMonth = 24;
+  78:main.c        **** //    Start.Year = 2015;
+  79:main.c        **** //    RTC_WriteTime(&Start);
+  80:main.c        **** //    
+  81:main.c        **** //    RTC_Start();
+  82:main.c        **** //    SEGUNDOS = RTC_ReadSecond();
+  83:main.c        ****     
+  84:main.c        ****     LCD_Start();
+  85:main.c        ****     Teclado_Start();
+  86:main.c        ****     PWM_Start();
+  87:main.c        ****     ADC_Start();
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 3
+
+
+  88:main.c        ****     Contaor_Start();
+  89:main.c        ****     AMux_1_Start();
+  90:main.c        ****     LED_Driver_1_Start();
+  91:main.c        ****     //LED_Driver_1_Write7SegNumberDec(0,0,4,LED_Driver_1_ZERO_PAD);
+  92:main.c        ****     LCD_LoadCustomFonts(LCD_customFonts); // Se cargan los custom fonts para el simbolo de grado °
+  93:main.c        ****     
+  94:main.c        ****     // Se inicializan interrupsiones ISR
+  95:main.c        ****     CY_ISR_PROTO(counter_ms);
+  96:main.c        ****     CY_ISR_PROTO(keyboard);
+  97:main.c        ****     CY_ISR_PROTO(exiit);
+  98:main.c        ****     
+  99:main.c        ****     // Mensaje Inicial
+ 100:main.c        ****     
+ 101:main.c        ****     LCD_Position(0,3);
+ 102:main.c        ****     LCD_PrintString("INCUBADORA LISTA");
+ 103:main.c        ****     LCD_Position(2,3);
+ 104:main.c        ****     LCD_PrintString("C - CERRAR PUERTA");
+ 105:main.c        ****     LCD_Position(3,3);
+ 106:main.c        ****     LCD_PrintString("B - CONFIGURAR");
+ 107:main.c        ****     
+ 108:main.c        ****     for(;;){
+ 109:main.c        **** //        if (SEGUNDOS!=RTC_ReadSecond()){
+ 110:main.c        **** //            LCD_Position(1,6);
+ 111:main.c        **** //            LCD_PrintNumber(RTC_ReadHour());
+ 112:main.c        **** //            LCD_PutChar(':');
+ 113:main.c        **** //            LCD_PrintNumber(RTC_ReadMinute());
+ 114:main.c        **** //            LCD_PutChar(':');
+ 115:main.c        **** //            LCD_PrintNumber(RTC_ReadSecond());
+ 116:main.c        **** //        }
+ 117:main.c        ****         ISR_Key_StartEx(keyboard);
+ 118:main.c        ****         UanMS_StartEx(counter_ms);
+ 119:main.c        ****         logoutisr_StartEx(exiit);
+ 120:main.c        ****         if (add == 1 && valores_confirmados==0){ // En caso de darle a alguna tecla en el menu de i
+ 121:main.c        ****             tecla = Teclado_AsignarTecla();
+ 122:main.c        ****             if (tecla=='C' && puerta_cerrada==0){ // SI SE PRESIONA PARA CERRAR
+ 123:main.c        ****                 PWM_WriteCompare((180*100)/9+400); 
+ 124:main.c        ****                 LCD_ClearDisplay();
+ 125:main.c        ****                 LCD_Position(2,3);
+ 126:main.c        ****                 LCD_PrintString("Puerta cerrada");
+ 127:main.c        ****                 CyDelay(1500);
+ 128:main.c        ****                 LCD_ClearDisplay();
+ 129:main.c        ****                 LCD_Position(0,2);
+ 130:main.c        ****                 LCD_PrintString("INCUBADORA LISTA");
+ 131:main.c        ****                 LCD_Position(2,3);
+ 132:main.c        ****                 LCD_PrintString("A - ABRIR PUERTA");
+ 133:main.c        ****                 LCD_Position(3,3);
+ 134:main.c        ****                 LCD_PrintString("B - CONFIGURAR");
+ 135:main.c        ****                 puerta_cerrada=1;
+ 136:main.c        ****                 bot1=0;
+ 137:main.c        ****             }
+ 138:main.c        ****             else if (tecla=='A' && puerta_cerrada==1){
+ 139:main.c        ****                 PWM_WriteCompare(1*100/9+400); 
+ 140:main.c        ****                 LCD_ClearDisplay();
+ 141:main.c        ****                 LCD_Position(2,3);
+ 142:main.c        ****                 LCD_PrintString("Puerta abierta");
+ 143:main.c        ****                 CyDelay(1500);
+ 144:main.c        ****                 LCD_ClearDisplay();
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 4
+
+
+ 145:main.c        ****                 LCD_Position(0,3);
+ 146:main.c        ****                 LCD_PrintString("INCUBADORA LISTA");
+ 147:main.c        ****                 LCD_Position(2,3);
+ 148:main.c        ****                 LCD_PrintString("C - CERRAR");
+ 149:main.c        ****                 LCD_Position(3,3);
+ 150:main.c        ****                 LCD_PrintString("B - CONFIGURAR");
+ 151:main.c        ****                 puerta_cerrada=0;
+ 152:main.c        ****                 
+ 153:main.c        ****             }
+ 154:main.c        ****             else if (tecla == 'B' && puerta_cerrada==1){
+ 155:main.c        ****                 LCD_ClearDisplay();
+ 156:main.c        ****                 LCD_Position(0,0);
+ 157:main.c        ****                 LCD_PrintString("Ingrese los valores:");
+ 158:main.c        ****                 LCD_Position(1,0);
+ 159:main.c        ****                 LCD_PrintString("TEMP: ");
+ 160:main.c        ****                 LCD_Position(2,0);
+ 161:main.c        ****                 LCD_PrintString("HUME: ");
+ 162:main.c        ****                 LCD_Position(3,0);
+ 163:main.c        ****                 LCD_PrintString("Time: ");
+ 164:main.c        ****                 CyDelay(2000);
+ 165:main.c        ****                 ingresando_valores=1;
+ 166:main.c        ****                 puerta_cerrada=0;
+ 167:main.c        ****                 
+ 168:main.c        ****             }
+ 169:main.c        ****             if (ingresando_valores==1){
+ 170:main.c        ****                   
+ 171:main.c        ****                 if (tecla >= 0 && tecla < 10 && temperatura_anadida==0){
+ 172:main.c        ****                     temp_in=temp_in*10+tecla;
+ 173:main.c        ****                     LCD_Position(1,6);
+ 174:main.c        ****                     LCD_PrintNumber(temp_in);
+ 175:main.c        ****                     LCD_PutChar(LCD_CUSTOM_0); // Simbolo °
+ 176:main.c        ****                     if (tecla=='#' && temp_in>0 && temp_in<=180){
+ 177:main.c        ****                         temperatura_anadida=1;
+ 178:main.c        ****                         led_Write(!led_Read());
+ 179:main.c        ****                         //tecla=0;
+ 180:main.c        ****                         //add=0;
+ 181:main.c        ****                     }
+ 182:main.c        ****                     else if (tecla=='#'){
+ 183:main.c        ****                         temp_in=0;
+ 184:main.c        ****                     }
+ 185:main.c        ****                 }
+ 186:main.c        ****                  else if (tecla >= 0 && tecla < 10 && humedad_anadida==0){
+ 187:main.c        ****                     humedad_in=humedad_in*10+tecla;
+ 188:main.c        ****                     LCD_Position(2,6);
+ 189:main.c        ****                     LCD_PrintNumber(humedad_in);
+ 190:main.c        ****                     LCD_PutChar('%'); // Simbolo %
+ 191:main.c        ****                     if (tecla=='#' && humedad_in>0 && humedad_in<=180){
+ 192:main.c        ****                         humedad_anadida=1;
+ 193:main.c        ****                     }
+ 194:main.c        ****                     else if (tecla=='#'){
+ 195:main.c        ****                         humedad_in=0;
+ 196:main.c        ****                     }
+ 197:main.c        ****                 }
+ 198:main.c        ****                 else if (tecla >= 0 && tecla < 10 && tiempo_anadido==0){
+ 199:main.c        ****                     tiempo_in=tiempo_in*10+tecla;
+ 200:main.c        ****                     LCD_Position(3,6);
+ 201:main.c        ****                     LCD_PrintNumber(tiempo_in);
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 5
+
+
+ 202:main.c        ****                     LCD_PutChar('m');
+ 203:main.c        ****                     if (tecla=='#' && tiempo_in>0 && tiempo_in<=60){
+ 204:main.c        ****                         tiempo_anadido=1;
+ 205:main.c        ****                     }
+ 206:main.c        ****                     else if (tecla=='#'){
+ 207:main.c        ****                         tiempo_in=0;
+ 208:main.c        ****                     }
+ 209:main.c        ****                 }
+ 210:main.c        ****                 else if (tecla=='D' && temperatura_anadida==1 && humedad_anadida==1 && tiempo_anadi
+ 211:main.c        ****                     valores_confirmados=1;
+ 212:main.c        ****                     ingresando_valores=0;
+ 213:main.c        ****                 }
+ 214:main.c        ****             }
+ 215:main.c        ****             add=0;
+ 216:main.c        ****         }
+ 217:main.c        ****         if (valores_confirmados==1){
+ 218:main.c        ****             //INICIA CONTENO Y 
+ 219:main.c        ****             iniciar_conteo=1;
+ 220:main.c        ****             mostrar_EnCilolcd=1;
+ 221:main.c        ****             sacar_adc=1;
+ 222:main.c        ****             valores_confirmados=0;
+ 223:main.c        ****         }
+ 224:main.c        ****         if (mostrar_EnCilolcd==1){
+ 225:main.c        ****             LCD_ClearDisplay();
+ 226:main.c        ****             LCD_Position(1,0);
+ 227:main.c        ****             LCD_PrintString("EN CICLO - NO ABRIR");
+ 228:main.c        ****             mostrar_EnCilolcd=0;
+ 229:main.c        ****         }
+ 230:main.c        ****         if (iniciar_conteo==1 && ms1==1){
+ 231:main.c        ****             
+ 232:main.c        ****             ms1=0;
+ 233:main.c        ****             miliseg_crono++;
+ 234:main.c        ****             if (miliseg_crono==1000){
+ 235:main.c        ****                 led_Write(!led_Read());
+ 236:main.c        ****                 miliseg_crono=0;
+ 237:main.c        ****                 
+ 238:main.c        ****                 segundos_crono++;
+ 239:main.c        ****                 if (segundos_crono==60){
+ 240:main.c        ****                     segundos_crono=0;
+ 241:main.c        ****                     min_crono++;
+ 242:main.c        ****                 }
+ 243:main.c        ****             }
+ 244:main.c        ****             LED_Driver_1_Write7SegDigitDec(min_crono/10,0);
+ 245:main.c        ****             LED_Driver_1_Write7SegDigitDec(min_crono%10,1);
+ 246:main.c        ****             LED_Driver_1_Write7SegDigitDec(segundos_crono/10,2);
+ 247:main.c        ****             LED_Driver_1_Write7SegDigitDec(segundos_crono%10,3);
+ 248:main.c        ****             // AQUI SE DEBE PONER EL CODIGO QUE PONGA LOS MINUTOS Y SEGUNDOS EN EL CONTADOR
+ 249:main.c        ****             //lUEGUITO LO HAGO YA QUE NISIQUIERA HAY JUMPERS PARA ESO
+ 250:main.c        ****             if (min_crono==tiempo_in){
+ 251:main.c        ****                 encender_alarma_ambas=1;
+ 252:main.c        ****                 iniciar_conteo=0;
+ 253:main.c        ****                 ciclo_acabado=0;
+ 254:main.c        ****             }
+ 255:main.c        ****             
+ 256:main.c        ****         }
+ 257:main.c        ****         if (ciclo_acabado==1){
+ 258:main.c        ****             LCD_CLEAR_DISPLAY;
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 6
+
+
+ 259:main.c        ****             LCD_Position(1,0);
+ 260:main.c        ****             LCD_PrintString("RETIRE LAS MUESTRAS");
+ 261:main.c        ****         }
+ 262:main.c        ****         if (sacar_adc==1){
+ 263:main.c        ****             if (ms2==1){// entra aqui cada ms
+ 264:main.c        ****                 ms2=0;
+ 265:main.c        ****                 contador_muestras++;
+ 266:main.c        ****                 if (contador_muestras%25 == 0){ // entra aqui cada 25 ms
+ 267:main.c        ****                     
+ 268:main.c        ****                     //MIDE LAS VARIABLES CON EL ADC
+ 269:main.c        ****                     AMux_1_Select(1);//HUMEDAD
+ 270:main.c        ****                     ADC_StartConvert();
+ 271:main.c        ****                     while(!ADC_IsEndConversion(ADC_RETURN_STATUS)){}
+ 272:main.c        ****                     senal_hume=ADC_GetResult16();
+ 273:main.c        ****                     senal_hume=ADC_CountsTo_mVolts(senal_hume);
+ 274:main.c        ****                     ADC_StopConvert();
+ 275:main.c        ****                     milivolt_h=(milivolt_h+senal_hume);
+ 276:main.c        ****                     
+ 277:main.c        ****                     AMux_1_Select(0);//TEMPERATURA
+ 278:main.c        ****                     ADC_StartConvert();
+ 279:main.c        ****                     while(!ADC_IsEndConversion(ADC_RETURN_STATUS)){}
+ 280:main.c        ****                     senal_temp=ADC_GetResult16();
+ 281:main.c        ****                     senal_temp=ADC_CountsTo_mVolts(senal_temp);
+ 282:main.c        ****                     ADC_StopConvert();
+ 283:main.c        ****                     milivolt_temp=milivolt_temp+senal_temp;
+ 284:main.c        ****                     
+ 285:main.c        ****                     if (contador_muestras==500){// ENTRA ACA CADA 20 MUESTRAS, ES DECIR CADA 500 ms
+ 286:main.c        ****                         contador_muestras=0; // se resetea la bandera
+ 287:main.c        ****                         milivolt_h=milivolt_h/20; // se saca el promedio de las 20 muetras del peso
+ 288:main.c        ****                         milivolt_temp=milivolt_temp/20;// se saca el promedio de las 20 muestras de
+ 289:main.c        ****                             
+ 290:main.c        ****                         humedad_medida=milivolt_h/50;
+ 291:main.c        ****                         temperatura_medida=milivolt_temp*0.036;
+ 292:main.c        ****                              
+ 293:main.c        ****                         LCD_Position(2,0);
+ 294:main.c        ****                         LCD_PrintString("humedad= ");
+ 295:main.c        ****                         LCD_PrintNumber(humedad_medida);
+ 296:main.c        ****                         LCD_PrintString("%  ");
+ 297:main.c        ****                         milivolt_h=0;
+ 298:main.c        ****                         
+ 299:main.c        ****                         LCD_Position(3,0);
+ 300:main.c        ****                         LCD_PrintString("Temp= ");
+ 301:main.c        ****                         LCD_PrintNumber(temperatura_medida);
+ 302:main.c        ****                         LCD_PutChar(LCD_CUSTOM_0);
+ 303:main.c        ****                         LCD_PrintString("F   ");
+ 304:main.c        ****                         milivolt_temp=0;
+ 305:main.c        ****                     }
+ 306:main.c        ****                 }
+ 307:main.c        ****             }
+ 308:main.c        ****             if (temperatura_medida>limite_temp && apagador_alarma==0){
+ 309:main.c        ****                 alarma_temPeligro=1;
+ 310:main.c        ****             }
+ 311:main.c        ****             else{
+ 312:main.c        ****                 alarma_temPeligro=0;
+ 313:main.c        ****             }
+ 314:main.c        ****             if (humedad_medida>limite_hum && apagador_alarma==0){
+ 315:main.c        ****                 alarma_humPeligro=1;
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 7
+
+
+ 316:main.c        ****             }
+ 317:main.c        ****             else{
+ 318:main.c        ****                 alarma_humPeligro=0;
+ 319:main.c        ****             }
+ 320:main.c        ****             if (humedad_medida>limite_hum && temperatura_medida>limite_temp && apagador_alarma==0){
+ 321:main.c        ****                 alarma_ambasPeligro=1;
+ 322:main.c        ****             }
+ 323:main.c        ****             
+ 324:main.c        ****         }
+ 325:main.c        ****         
+ 326:main.c        ****         
+ 327:main.c        ****        
+ 328:main.c        ****     }
+ 329:main.c        **** }
+ 330:main.c        **** 
+ 331:main.c        **** CY_ISR_PROTO(keyboard){
+  28              		.loc 1 331 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+ 332:main.c        ****     add = 1;
+  33              		.loc 1 332 0
+  34 0000 0122     		movs	r2, #1
+  35 0002 014B     		ldr	r3, .L2
+  36 0004 1A70     		strb	r2, [r3]
+  37 0006 7047     		bx	lr
+  38              	.L3:
+  39              		.align	2
+  40              	.L2:
+  41 0008 00000000 		.word	.LANCHOR0
+  42              		.cfi_endproc
+  43              	.LFE64:
+  44              		.size	keyboard, .-keyboard
+  45              		.section	.text.counter_ms,"ax",%progbits
+  46              		.align	2
+  47              		.global	counter_ms
+  48              		.thumb
+  49              		.thumb_func
+  50              		.type	counter_ms, %function
+  51              	counter_ms:
+  52              	.LFB65:
+ 333:main.c        ****     
+ 334:main.c        **** }
+ 335:main.c        **** 
+ 336:main.c        **** CY_ISR_PROTO(counter_ms){
+  53              		.loc 1 336 0
+  54              		.cfi_startproc
+  55              		@ args = 0, pretend = 0, frame = 0
+  56              		@ frame_needed = 0, uses_anonymous_args = 0
+  57              		@ link register save eliminated.
+ 337:main.c        ****     ms1 = 1;
+  58              		.loc 1 337 0
+  59 0000 024B     		ldr	r3, .L5
+  60 0002 0122     		movs	r2, #1
+  61 0004 5A70     		strb	r2, [r3, #1]
+ 338:main.c        ****     ms2=1;
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 8
+
+
+  62              		.loc 1 338 0
+  63 0006 9A70     		strb	r2, [r3, #2]
+  64 0008 7047     		bx	lr
+  65              	.L6:
+  66 000a 00BF     		.align	2
+  67              	.L5:
+  68 000c 00000000 		.word	.LANCHOR0
+  69              		.cfi_endproc
+  70              	.LFE65:
+  71              		.size	counter_ms, .-counter_ms
+  72              		.section	.text.exiit,"ax",%progbits
+  73              		.align	2
+  74              		.global	exiit
+  75              		.thumb
+  76              		.thumb_func
+  77              		.type	exiit, %function
+  78              	exiit:
+  79              	.LFB66:
+ 339:main.c        ****     
+ 340:main.c        **** }
+ 341:main.c        **** 
+ 342:main.c        **** CY_ISR_PROTO(exiit){ 
+  80              		.loc 1 342 0
+  81              		.cfi_startproc
+  82              		@ args = 0, pretend = 0, frame = 0
+  83              		@ frame_needed = 0, uses_anonymous_args = 0
+  84              		@ link register save eliminated.
+ 343:main.c        ****     bot1=1;
+  85              		.loc 1 343 0
+  86 0000 0122     		movs	r2, #1
+  87 0002 014B     		ldr	r3, .L8
+  88 0004 1A70     		strb	r2, [r3]
+  89 0006 7047     		bx	lr
+  90              	.L9:
+  91              		.align	2
+  92              	.L8:
+  93 0008 00000000 		.word	bot1
+  94              		.cfi_endproc
+  95              	.LFE66:
+  96              		.size	exiit, .-exiit
+  97              		.global	__aeabi_ui2d
+  98              		.global	__aeabi_dmul
+  99              		.global	__aeabi_d2uiz
+ 100              		.section	.text.main,"ax",%progbits
+ 101              		.align	2
+ 102              		.global	main
+ 103              		.thumb
+ 104              		.thumb_func
+ 105              		.type	main, %function
+ 106              	main:
+ 107              	.LFB63:
+  71:main.c        ****     CyGlobalIntEnable; // Se inicializan los modulos necesarios
+ 108              		.loc 1 71 0
+ 109              		.cfi_startproc
+ 110              		@ Volatile: function does not return.
+ 111              		@ args = 0, pretend = 0, frame = 0
+ 112              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 9
+
+
+ 113 0000 80B5     		push	{r7, lr}
+ 114              		.cfi_def_cfa_offset 8
+ 115              		.cfi_offset 7, -8
+ 116              		.cfi_offset 14, -4
+  72:main.c        ****     
+ 117              		.loc 1 72 0
+ 118              		.syntax unified
+ 119              	@ 72 "main.c" 1
+ 120 0002 62B6     		CPSIE   i
+ 121              	@ 0 "" 2
+  84:main.c        ****     Teclado_Start();
+ 122              		.loc 1 84 0
+ 123              		.thumb
+ 124              		.syntax unified
+ 125 0004 FFF7FEFF 		bl	LCD_Start
+ 126              	.LVL0:
+  85:main.c        ****     PWM_Start();
+ 127              		.loc 1 85 0
+ 128 0008 FFF7FEFF 		bl	Teclado_Start
+ 129              	.LVL1:
+  86:main.c        ****     ADC_Start();
+ 130              		.loc 1 86 0
+ 131 000c FFF7FEFF 		bl	PWM_Start
+ 132              	.LVL2:
+  87:main.c        ****     Contaor_Start();
+ 133              		.loc 1 87 0
+ 134 0010 FFF7FEFF 		bl	ADC_Start
+ 135              	.LVL3:
+  88:main.c        ****     AMux_1_Start();
+ 136              		.loc 1 88 0
+ 137 0014 FFF7FEFF 		bl	Contaor_Start
+ 138              	.LVL4:
+  89:main.c        ****     LED_Driver_1_Start();
+ 139              		.loc 1 89 0
+ 140 0018 FFF7FEFF 		bl	AMux_1_Start
+ 141              	.LVL5:
+  90:main.c        ****     //LED_Driver_1_Write7SegNumberDec(0,0,4,LED_Driver_1_ZERO_PAD);
+ 142              		.loc 1 90 0
+ 143 001c FFF7FEFF 		bl	LED_Driver_1_Start
+ 144              	.LVL6:
+  92:main.c        ****     
+ 145              		.loc 1 92 0
+ 146 0020 A748     		ldr	r0, .L38
+ 147 0022 FFF7FEFF 		bl	LCD_LoadCustomFonts
+ 148              	.LVL7:
+ 101:main.c        ****     LCD_PrintString("INCUBADORA LISTA");
+ 149              		.loc 1 101 0
+ 150 0026 0321     		movs	r1, #3
+ 151 0028 0020     		movs	r0, #0
+ 152 002a FFF7FEFF 		bl	LCD_Position
+ 153              	.LVL8:
+ 102:main.c        ****     LCD_Position(2,3);
+ 154              		.loc 1 102 0
+ 155 002e A548     		ldr	r0, .L38+4
+ 156 0030 FFF7FEFF 		bl	LCD_PrintString
+ 157              	.LVL9:
+ 103:main.c        ****     LCD_PrintString("C - CERRAR PUERTA");
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 10
+
+
+ 158              		.loc 1 103 0
+ 159 0034 0321     		movs	r1, #3
+ 160 0036 0220     		movs	r0, #2
+ 161 0038 FFF7FEFF 		bl	LCD_Position
+ 162              	.LVL10:
+ 104:main.c        ****     LCD_Position(3,3);
+ 163              		.loc 1 104 0
+ 164 003c A248     		ldr	r0, .L38+8
+ 165 003e FFF7FEFF 		bl	LCD_PrintString
+ 166              	.LVL11:
+ 105:main.c        ****     LCD_PrintString("B - CONFIGURAR");
+ 167              		.loc 1 105 0
+ 168 0042 0321     		movs	r1, #3
+ 169 0044 0846     		mov	r0, r1
+ 170 0046 FFF7FEFF 		bl	LCD_Position
+ 171              	.LVL12:
+ 106:main.c        ****     
+ 172              		.loc 1 106 0
+ 173 004a A048     		ldr	r0, .L38+12
+ 174 004c FFF7FEFF 		bl	LCD_PrintString
+ 175              	.LVL13:
+ 176              	.L28:
+ 117:main.c        ****         UanMS_StartEx(counter_ms);
+ 177              		.loc 1 117 0
+ 178 0050 9F48     		ldr	r0, .L38+16
+ 179 0052 FFF7FEFF 		bl	ISR_Key_StartEx
+ 180              	.LVL14:
+ 118:main.c        ****         logoutisr_StartEx(exiit);
+ 181              		.loc 1 118 0
+ 182 0056 9F48     		ldr	r0, .L38+20
+ 183 0058 FFF7FEFF 		bl	UanMS_StartEx
+ 184              	.LVL15:
+ 119:main.c        ****         if (add == 1 && valores_confirmados==0){ // En caso de darle a alguna tecla en el menu de i
+ 185              		.loc 1 119 0
+ 186 005c 9E48     		ldr	r0, .L38+24
+ 187 005e FFF7FEFF 		bl	logoutisr_StartEx
+ 188              	.LVL16:
+ 120:main.c        ****             tecla = Teclado_AsignarTecla();
+ 189              		.loc 1 120 0
+ 190 0062 9E4B     		ldr	r3, .L38+28
+ 191 0064 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 192 0066 012B     		cmp	r3, #1
+ 193 0068 40F06781 		bne	.L12
+ 120:main.c        ****             tecla = Teclado_AsignarTecla();
+ 194              		.loc 1 120 0 is_stmt 0 discriminator 1
+ 195 006c 9C4B     		ldr	r3, .L38+32
+ 196 006e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 197 0070 002B     		cmp	r3, #0
+ 198 0072 40F06281 		bne	.L12
+ 199              	.LBB2:
+ 121:main.c        ****             if (tecla=='C' && puerta_cerrada==0){ // SI SE PRESIONA PARA CERRAR
+ 200              		.loc 1 121 0 is_stmt 1
+ 201 0076 FFF7FEFF 		bl	Teclado_AsignarTecla
+ 202              	.LVL17:
+ 203 007a C0B2     		uxtb	r0, r0
+ 204 007c 994B     		ldr	r3, .L38+36
+ 205 007e 1870     		strb	r0, [r3]
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 11
+
+
+ 122:main.c        ****                 PWM_WriteCompare((180*100)/9+400); 
+ 206              		.loc 1 122 0
+ 207 0080 4328     		cmp	r0, #67
+ 208 0082 33D1     		bne	.L13
+ 122:main.c        ****                 PWM_WriteCompare((180*100)/9+400); 
+ 209              		.loc 1 122 0 is_stmt 0 discriminator 1
+ 210 0084 954B     		ldr	r3, .L38+28
+ 211 0086 DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 212 0088 83BB     		cbnz	r3, .L13
+ 123:main.c        ****                 LCD_ClearDisplay();
+ 213              		.loc 1 123 0 is_stmt 1
+ 214 008a 4FF41660 		mov	r0, #2400
+ 215 008e FFF7FEFF 		bl	PWM_WriteCompare
+ 216              	.LVL18:
+ 124:main.c        ****                 LCD_Position(2,3);
+ 217              		.loc 1 124 0
+ 218 0092 0120     		movs	r0, #1
+ 219 0094 FFF7FEFF 		bl	LCD_WriteControl
+ 220              	.LVL19:
+ 125:main.c        ****                 LCD_PrintString("Puerta cerrada");
+ 221              		.loc 1 125 0
+ 222 0098 0321     		movs	r1, #3
+ 223 009a 0220     		movs	r0, #2
+ 224 009c FFF7FEFF 		bl	LCD_Position
+ 225              	.LVL20:
+ 126:main.c        ****                 CyDelay(1500);
+ 226              		.loc 1 126 0
+ 227 00a0 9148     		ldr	r0, .L38+40
+ 228 00a2 FFF7FEFF 		bl	LCD_PrintString
+ 229              	.LVL21:
+ 127:main.c        ****                 LCD_ClearDisplay();
+ 230              		.loc 1 127 0
+ 231 00a6 40F2DC50 		movw	r0, #1500
+ 232 00aa FFF7FEFF 		bl	CyDelay
+ 233              	.LVL22:
+ 128:main.c        ****                 LCD_Position(0,2);
+ 234              		.loc 1 128 0
+ 235 00ae 0120     		movs	r0, #1
+ 236 00b0 FFF7FEFF 		bl	LCD_WriteControl
+ 237              	.LVL23:
+ 129:main.c        ****                 LCD_PrintString("INCUBADORA LISTA");
+ 238              		.loc 1 129 0
+ 239 00b4 0221     		movs	r1, #2
+ 240 00b6 0020     		movs	r0, #0
+ 241 00b8 FFF7FEFF 		bl	LCD_Position
+ 242              	.LVL24:
+ 130:main.c        ****                 LCD_Position(2,3);
+ 243              		.loc 1 130 0
+ 244 00bc 8148     		ldr	r0, .L38+4
+ 245 00be FFF7FEFF 		bl	LCD_PrintString
+ 246              	.LVL25:
+ 131:main.c        ****                 LCD_PrintString("A - ABRIR PUERTA");
+ 247              		.loc 1 131 0
+ 248 00c2 0321     		movs	r1, #3
+ 249 00c4 0220     		movs	r0, #2
+ 250 00c6 FFF7FEFF 		bl	LCD_Position
+ 251              	.LVL26:
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 12
+
+
+ 132:main.c        ****                 LCD_Position(3,3);
+ 252              		.loc 1 132 0
+ 253 00ca 8848     		ldr	r0, .L38+44
+ 254 00cc FFF7FEFF 		bl	LCD_PrintString
+ 255              	.LVL27:
+ 133:main.c        ****                 LCD_PrintString("B - CONFIGURAR");
+ 256              		.loc 1 133 0
+ 257 00d0 0321     		movs	r1, #3
+ 258 00d2 0846     		mov	r0, r1
+ 259 00d4 FFF7FEFF 		bl	LCD_Position
+ 260              	.LVL28:
+ 134:main.c        ****                 puerta_cerrada=1;
+ 261              		.loc 1 134 0
+ 262 00d8 7C48     		ldr	r0, .L38+12
+ 263 00da FFF7FEFF 		bl	LCD_PrintString
+ 264              	.LVL29:
+ 135:main.c        ****                 bot1=0;
+ 265              		.loc 1 135 0
+ 266 00de 0122     		movs	r2, #1
+ 267 00e0 7E4B     		ldr	r3, .L38+28
+ 268 00e2 DA70     		strb	r2, [r3, #3]
+ 136:main.c        ****             }
+ 269              		.loc 1 136 0
+ 270 00e4 0022     		movs	r2, #0
+ 271 00e6 824B     		ldr	r3, .L38+48
+ 272 00e8 1A70     		strb	r2, [r3]
+ 273 00ea 61E0     		b	.L14
+ 274              	.L13:
+ 138:main.c        ****                 PWM_WriteCompare(1*100/9+400); 
+ 275              		.loc 1 138 0
+ 276 00ec 4128     		cmp	r0, #65
+ 277 00ee 31D1     		bne	.L15
+ 138:main.c        ****                 PWM_WriteCompare(1*100/9+400); 
+ 278              		.loc 1 138 0 is_stmt 0 discriminator 1
+ 279 00f0 7A4B     		ldr	r3, .L38+28
+ 280 00f2 DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 281 00f4 012B     		cmp	r3, #1
+ 282 00f6 2DD1     		bne	.L15
+ 139:main.c        ****                 LCD_ClearDisplay();
+ 283              		.loc 1 139 0 is_stmt 1
+ 284 00f8 40F29B10 		movw	r0, #411
+ 285 00fc FFF7FEFF 		bl	PWM_WriteCompare
+ 286              	.LVL30:
+ 140:main.c        ****                 LCD_Position(2,3);
+ 287              		.loc 1 140 0
+ 288 0100 0120     		movs	r0, #1
+ 289 0102 FFF7FEFF 		bl	LCD_WriteControl
+ 290              	.LVL31:
+ 141:main.c        ****                 LCD_PrintString("Puerta abierta");
+ 291              		.loc 1 141 0
+ 292 0106 0321     		movs	r1, #3
+ 293 0108 0220     		movs	r0, #2
+ 294 010a FFF7FEFF 		bl	LCD_Position
+ 295              	.LVL32:
+ 142:main.c        ****                 CyDelay(1500);
+ 296              		.loc 1 142 0
+ 297 010e 7948     		ldr	r0, .L38+52
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 13
+
+
+ 298 0110 FFF7FEFF 		bl	LCD_PrintString
+ 299              	.LVL33:
+ 143:main.c        ****                 LCD_ClearDisplay();
+ 300              		.loc 1 143 0
+ 301 0114 40F2DC50 		movw	r0, #1500
+ 302 0118 FFF7FEFF 		bl	CyDelay
+ 303              	.LVL34:
+ 144:main.c        ****                 LCD_Position(0,3);
+ 304              		.loc 1 144 0
+ 305 011c 0120     		movs	r0, #1
+ 306 011e FFF7FEFF 		bl	LCD_WriteControl
+ 307              	.LVL35:
+ 145:main.c        ****                 LCD_PrintString("INCUBADORA LISTA");
+ 308              		.loc 1 145 0
+ 309 0122 0321     		movs	r1, #3
+ 310 0124 0020     		movs	r0, #0
+ 311 0126 FFF7FEFF 		bl	LCD_Position
+ 312              	.LVL36:
+ 146:main.c        ****                 LCD_Position(2,3);
+ 313              		.loc 1 146 0
+ 314 012a 6648     		ldr	r0, .L38+4
+ 315 012c FFF7FEFF 		bl	LCD_PrintString
+ 316              	.LVL37:
+ 147:main.c        ****                 LCD_PrintString("C - CERRAR");
+ 317              		.loc 1 147 0
+ 318 0130 0321     		movs	r1, #3
+ 319 0132 0220     		movs	r0, #2
+ 320 0134 FFF7FEFF 		bl	LCD_Position
+ 321              	.LVL38:
+ 148:main.c        ****                 LCD_Position(3,3);
+ 322              		.loc 1 148 0
+ 323 0138 6F48     		ldr	r0, .L38+56
+ 324 013a FFF7FEFF 		bl	LCD_PrintString
+ 325              	.LVL39:
+ 149:main.c        ****                 LCD_PrintString("B - CONFIGURAR");
+ 326              		.loc 1 149 0
+ 327 013e 0321     		movs	r1, #3
+ 328 0140 0846     		mov	r0, r1
+ 329 0142 FFF7FEFF 		bl	LCD_Position
+ 330              	.LVL40:
+ 150:main.c        ****                 puerta_cerrada=0;
+ 331              		.loc 1 150 0
+ 332 0146 6148     		ldr	r0, .L38+12
+ 333 0148 FFF7FEFF 		bl	LCD_PrintString
+ 334              	.LVL41:
+ 151:main.c        ****                 
+ 335              		.loc 1 151 0
+ 336 014c 0022     		movs	r2, #0
+ 337 014e 634B     		ldr	r3, .L38+28
+ 338 0150 DA70     		strb	r2, [r3, #3]
+ 339 0152 2DE0     		b	.L14
+ 340              	.L15:
+ 154:main.c        ****                 LCD_ClearDisplay();
+ 341              		.loc 1 154 0
+ 342 0154 4228     		cmp	r0, #66
+ 343 0156 2BD1     		bne	.L14
+ 154:main.c        ****                 LCD_ClearDisplay();
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 14
+
+
+ 344              		.loc 1 154 0 is_stmt 0 discriminator 1
+ 345 0158 604B     		ldr	r3, .L38+28
+ 346 015a DB78     		ldrb	r3, [r3, #3]	@ zero_extendqisi2
+ 347 015c 012B     		cmp	r3, #1
+ 348 015e 27D1     		bne	.L14
+ 155:main.c        ****                 LCD_Position(0,0);
+ 349              		.loc 1 155 0 is_stmt 1
+ 350 0160 0120     		movs	r0, #1
+ 351 0162 FFF7FEFF 		bl	LCD_WriteControl
+ 352              	.LVL42:
+ 156:main.c        ****                 LCD_PrintString("Ingrese los valores:");
+ 353              		.loc 1 156 0
+ 354 0166 0021     		movs	r1, #0
+ 355 0168 0846     		mov	r0, r1
+ 356 016a FFF7FEFF 		bl	LCD_Position
+ 357              	.LVL43:
+ 157:main.c        ****                 LCD_Position(1,0);
+ 358              		.loc 1 157 0
+ 359 016e 6348     		ldr	r0, .L38+60
+ 360 0170 FFF7FEFF 		bl	LCD_PrintString
+ 361              	.LVL44:
+ 158:main.c        ****                 LCD_PrintString("TEMP: ");
+ 362              		.loc 1 158 0
+ 363 0174 0021     		movs	r1, #0
+ 364 0176 0120     		movs	r0, #1
+ 365 0178 FFF7FEFF 		bl	LCD_Position
+ 366              	.LVL45:
+ 159:main.c        ****                 LCD_Position(2,0);
+ 367              		.loc 1 159 0
+ 368 017c 6048     		ldr	r0, .L38+64
+ 369 017e FFF7FEFF 		bl	LCD_PrintString
+ 370              	.LVL46:
+ 160:main.c        ****                 LCD_PrintString("HUME: ");
+ 371              		.loc 1 160 0
+ 372 0182 0021     		movs	r1, #0
+ 373 0184 0220     		movs	r0, #2
+ 374 0186 FFF7FEFF 		bl	LCD_Position
+ 375              	.LVL47:
+ 161:main.c        ****                 LCD_Position(3,0);
+ 376              		.loc 1 161 0
+ 377 018a 5E48     		ldr	r0, .L38+68
+ 378 018c FFF7FEFF 		bl	LCD_PrintString
+ 379              	.LVL48:
+ 162:main.c        ****                 LCD_PrintString("Time: ");
+ 380              		.loc 1 162 0
+ 381 0190 0021     		movs	r1, #0
+ 382 0192 0320     		movs	r0, #3
+ 383 0194 FFF7FEFF 		bl	LCD_Position
+ 384              	.LVL49:
+ 163:main.c        ****                 CyDelay(2000);
+ 385              		.loc 1 163 0
+ 386 0198 5B48     		ldr	r0, .L38+72
+ 387 019a FFF7FEFF 		bl	LCD_PrintString
+ 388              	.LVL50:
+ 164:main.c        ****                 ingresando_valores=1;
+ 389              		.loc 1 164 0
+ 390 019e 4FF4FA60 		mov	r0, #2000
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 15
+
+
+ 391 01a2 FFF7FEFF 		bl	CyDelay
+ 392              	.LVL51:
+ 165:main.c        ****                 puerta_cerrada=0;
+ 393              		.loc 1 165 0
+ 394 01a6 4D4B     		ldr	r3, .L38+28
+ 395 01a8 0122     		movs	r2, #1
+ 396 01aa 1A71     		strb	r2, [r3, #4]
+ 166:main.c        ****                 
+ 397              		.loc 1 166 0
+ 398 01ac 0022     		movs	r2, #0
+ 399 01ae DA70     		strb	r2, [r3, #3]
+ 400              	.L14:
+ 169:main.c        ****                   
+ 401              		.loc 1 169 0
+ 402 01b0 4A4B     		ldr	r3, .L38+28
+ 403 01b2 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
+ 404 01b4 012B     		cmp	r3, #1
+ 405 01b6 40F0BD80 		bne	.L16
+ 171:main.c        ****                     temp_in=temp_in*10+tecla;
+ 406              		.loc 1 171 0
+ 407 01ba 4A4B     		ldr	r3, .L38+36
+ 408 01bc 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 409 01be 092B     		cmp	r3, #9
+ 410 01c0 2DD8     		bhi	.L17
+ 171:main.c        ****                     temp_in=temp_in*10+tecla;
+ 411              		.loc 1 171 0 is_stmt 0 discriminator 1
+ 412 01c2 464A     		ldr	r2, .L38+28
+ 413 01c4 5279     		ldrb	r2, [r2, #5]	@ zero_extendqisi2
+ 414 01c6 52BB     		cbnz	r2, .L17
+ 172:main.c        ****                     LCD_Position(1,6);
+ 415              		.loc 1 172 0 is_stmt 1
+ 416 01c8 454C     		ldr	r4, .L38+32
+ 417 01ca 6268     		ldr	r2, [r4, #4]
+ 418 01cc 02EB8202 		add	r2, r2, r2, lsl #2
+ 419 01d0 5100     		lsls	r1, r2, #1
+ 420 01d2 0B44     		add	r3, r3, r1
+ 421 01d4 6360     		str	r3, [r4, #4]
+ 173:main.c        ****                     LCD_PrintNumber(temp_in);
+ 422              		.loc 1 173 0
+ 423 01d6 0621     		movs	r1, #6
+ 424 01d8 0120     		movs	r0, #1
+ 425 01da FFF7FEFF 		bl	LCD_Position
+ 426              	.LVL52:
+ 174:main.c        ****                     LCD_PutChar(LCD_CUSTOM_0); // Simbolo °
+ 427              		.loc 1 174 0
+ 428 01de A088     		ldrh	r0, [r4, #4]
+ 429 01e0 FFF7FEFF 		bl	LCD_PrintU32Number
+ 430              	.LVL53:
+ 175:main.c        ****                     if (tecla=='#' && temp_in>0 && temp_in<=180){
+ 431              		.loc 1 175 0
+ 432 01e4 0020     		movs	r0, #0
+ 433 01e6 FFF7FEFF 		bl	LCD_PutChar
+ 434              	.LVL54:
+ 176:main.c        ****                         temperatura_anadida=1;
+ 435              		.loc 1 176 0
+ 436 01ea 3E4B     		ldr	r3, .L38+36
+ 437 01ec 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 16
+
+
+ 438 01ee 232B     		cmp	r3, #35
+ 439 01f0 0ED1     		bne	.L18
+ 176:main.c        ****                         temperatura_anadida=1;
+ 440              		.loc 1 176 0 is_stmt 0 discriminator 1
+ 441 01f2 6268     		ldr	r2, [r4, #4]
+ 442 01f4 62B1     		cbz	r2, .L18
+ 176:main.c        ****                         temperatura_anadida=1;
+ 443              		.loc 1 176 0 discriminator 2
+ 444 01f6 B42A     		cmp	r2, #180
+ 445 01f8 0AD8     		bhi	.L18
+ 177:main.c        ****                         led_Write(!led_Read());
+ 446              		.loc 1 177 0 is_stmt 1
+ 447 01fa 0122     		movs	r2, #1
+ 448 01fc 374B     		ldr	r3, .L38+28
+ 449 01fe 5A71     		strb	r2, [r3, #5]
+ 178:main.c        ****                         //tecla=0;
+ 450              		.loc 1 178 0
+ 451 0200 FFF7FEFF 		bl	led_Read
+ 452              	.LVL55:
+ 453 0204 B0FA80F0 		clz	r0, r0
+ 454 0208 4009     		lsrs	r0, r0, #5
+ 455 020a FFF7FEFF 		bl	led_Write
+ 456              	.LVL56:
+ 457 020e 91E0     		b	.L16
+ 458              	.L18:
+ 182:main.c        ****                         temp_in=0;
+ 459              		.loc 1 182 0
+ 460 0210 232B     		cmp	r3, #35
+ 461 0212 40F08F80 		bne	.L16
+ 183:main.c        ****                     }
+ 462              		.loc 1 183 0
+ 463 0216 0022     		movs	r2, #0
+ 464 0218 314B     		ldr	r3, .L38+32
+ 465 021a 5A60     		str	r2, [r3, #4]
+ 466 021c 8AE0     		b	.L16
+ 467              	.L17:
+ 186:main.c        ****                     humedad_in=humedad_in*10+tecla;
+ 468              		.loc 1 186 0
+ 469 021e 092B     		cmp	r3, #9
+ 470 0220 24D8     		bhi	.L19
+ 186:main.c        ****                     humedad_in=humedad_in*10+tecla;
+ 471              		.loc 1 186 0 is_stmt 0 discriminator 1
+ 472 0222 2E4A     		ldr	r2, .L38+28
+ 473 0224 9279     		ldrb	r2, [r2, #6]	@ zero_extendqisi2
+ 474 0226 0ABB     		cbnz	r2, .L19
+ 187:main.c        ****                     LCD_Position(2,6);
+ 475              		.loc 1 187 0 is_stmt 1
+ 476 0228 2C4C     		ldr	r4, .L38+28
+ 477 022a A268     		ldr	r2, [r4, #8]
+ 478 022c 02EB8202 		add	r2, r2, r2, lsl #2
+ 479 0230 5100     		lsls	r1, r2, #1
+ 480 0232 0B44     		add	r3, r3, r1
+ 481 0234 A360     		str	r3, [r4, #8]
+ 188:main.c        ****                     LCD_PrintNumber(humedad_in);
+ 482              		.loc 1 188 0
+ 483 0236 0621     		movs	r1, #6
+ 484 0238 0220     		movs	r0, #2
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 17
+
+
+ 485 023a FFF7FEFF 		bl	LCD_Position
+ 486              	.LVL57:
+ 189:main.c        ****                     LCD_PutChar('%'); // Simbolo %
+ 487              		.loc 1 189 0
+ 488 023e 2089     		ldrh	r0, [r4, #8]
+ 489 0240 FFF7FEFF 		bl	LCD_PrintU32Number
+ 490              	.LVL58:
+ 190:main.c        ****                     if (tecla=='#' && humedad_in>0 && humedad_in<=180){
+ 491              		.loc 1 190 0
+ 492 0244 2520     		movs	r0, #37
+ 493 0246 FFF7FEFF 		bl	LCD_PutChar
+ 494              	.LVL59:
+ 191:main.c        ****                         humedad_anadida=1;
+ 495              		.loc 1 191 0
+ 496 024a 264B     		ldr	r3, .L38+36
+ 497 024c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 498 024e 232B     		cmp	r3, #35
+ 499 0250 06D1     		bne	.L20
+ 191:main.c        ****                         humedad_anadida=1;
+ 500              		.loc 1 191 0 is_stmt 0 discriminator 1
+ 501 0252 A268     		ldr	r2, [r4, #8]
+ 502 0254 22B1     		cbz	r2, .L20
+ 191:main.c        ****                         humedad_anadida=1;
+ 503              		.loc 1 191 0 discriminator 2
+ 504 0256 B42A     		cmp	r2, #180
+ 505 0258 02D8     		bhi	.L20
+ 192:main.c        ****                     }
+ 506              		.loc 1 192 0 is_stmt 1
+ 507 025a 0122     		movs	r2, #1
+ 508 025c A271     		strb	r2, [r4, #6]
+ 509 025e 69E0     		b	.L16
+ 510              	.L20:
+ 194:main.c        ****                         humedad_in=0;
+ 511              		.loc 1 194 0
+ 512 0260 232B     		cmp	r3, #35
+ 513 0262 67D1     		bne	.L16
+ 195:main.c        ****                     }
+ 514              		.loc 1 195 0
+ 515 0264 0022     		movs	r2, #0
+ 516 0266 1D4B     		ldr	r3, .L38+28
+ 517 0268 9A60     		str	r2, [r3, #8]
+ 518 026a 63E0     		b	.L16
+ 519              	.L19:
+ 198:main.c        ****                     tiempo_in=tiempo_in*10+tecla;
+ 520              		.loc 1 198 0
+ 521 026c 092B     		cmp	r3, #9
+ 522 026e 4DD8     		bhi	.L21
+ 198:main.c        ****                     tiempo_in=tiempo_in*10+tecla;
+ 523              		.loc 1 198 0 is_stmt 0 discriminator 1
+ 524 0270 1A4A     		ldr	r2, .L38+28
+ 525 0272 127B     		ldrb	r2, [r2, #12]	@ zero_extendqisi2
+ 526 0274 002A     		cmp	r2, #0
+ 527 0276 49D1     		bne	.L21
+ 199:main.c        ****                     LCD_Position(3,6);
+ 528              		.loc 1 199 0 is_stmt 1
+ 529 0278 194C     		ldr	r4, .L38+32
+ 530 027a A268     		ldr	r2, [r4, #8]
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 18
+
+
+ 531 027c 02EB8202 		add	r2, r2, r2, lsl #2
+ 532 0280 5100     		lsls	r1, r2, #1
+ 533 0282 0B44     		add	r3, r3, r1
+ 534 0284 A360     		str	r3, [r4, #8]
+ 200:main.c        ****                     LCD_PrintNumber(tiempo_in);
+ 535              		.loc 1 200 0
+ 536 0286 0621     		movs	r1, #6
+ 537 0288 0320     		movs	r0, #3
+ 538 028a FFF7FEFF 		bl	LCD_Position
+ 539              	.LVL60:
+ 201:main.c        ****                     LCD_PutChar('m');
+ 540              		.loc 1 201 0
+ 541 028e 2089     		ldrh	r0, [r4, #8]
+ 542 0290 FFF7FEFF 		bl	LCD_PrintU32Number
+ 543              	.LVL61:
+ 202:main.c        ****                     if (tecla=='#' && tiempo_in>0 && tiempo_in<=60){
+ 544              		.loc 1 202 0
+ 545 0294 6D20     		movs	r0, #109
+ 546 0296 FFF7FEFF 		bl	LCD_PutChar
+ 547              	.LVL62:
+ 203:main.c        ****                         tiempo_anadido=1;
+ 548              		.loc 1 203 0
+ 549 029a 124B     		ldr	r3, .L38+36
+ 550 029c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 551 029e 232B     		cmp	r3, #35
+ 552 02a0 07D1     		bne	.L22
+ 203:main.c        ****                         tiempo_anadido=1;
+ 553              		.loc 1 203 0 is_stmt 0 discriminator 1
+ 554 02a2 A268     		ldr	r2, [r4, #8]
+ 555 02a4 2AB1     		cbz	r2, .L22
+ 203:main.c        ****                         tiempo_anadido=1;
+ 556              		.loc 1 203 0 discriminator 2
+ 557 02a6 3C2A     		cmp	r2, #60
+ 558 02a8 03D8     		bhi	.L22
+ 204:main.c        ****                     }
+ 559              		.loc 1 204 0 is_stmt 1
+ 560 02aa 0122     		movs	r2, #1
+ 561 02ac 0B4B     		ldr	r3, .L38+28
+ 562 02ae 1A73     		strb	r2, [r3, #12]
+ 563 02b0 40E0     		b	.L16
+ 564              	.L22:
+ 206:main.c        ****                         tiempo_in=0;
+ 565              		.loc 1 206 0
+ 566 02b2 232B     		cmp	r3, #35
+ 567 02b4 3ED1     		bne	.L16
+ 207:main.c        ****                     }
+ 568              		.loc 1 207 0
+ 569 02b6 0022     		movs	r2, #0
+ 570 02b8 094B     		ldr	r3, .L38+32
+ 571 02ba 9A60     		str	r2, [r3, #8]
+ 572 02bc 3AE0     		b	.L16
+ 573              	.L39:
+ 574 02be 00BF     		.align	2
+ 575              	.L38:
+ 576 02c0 00000000 		.word	LCD_customFonts
+ 577 02c4 00000000 		.word	.LC0
+ 578 02c8 14000000 		.word	.LC1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 19
+
+
+ 579 02cc 28000000 		.word	.LC2
+ 580 02d0 00000000 		.word	keyboard
+ 581 02d4 00000000 		.word	counter_ms
+ 582 02d8 00000000 		.word	exiit
+ 583 02dc 00000000 		.word	.LANCHOR0
+ 584 02e0 00000000 		.word	.LANCHOR1
+ 585 02e4 00000000 		.word	tecla
+ 586 02e8 38000000 		.word	.LC3
+ 587 02ec 48000000 		.word	.LC4
+ 588 02f0 00000000 		.word	bot1
+ 589 02f4 5C000000 		.word	.LC5
+ 590 02f8 6C000000 		.word	.LC6
+ 591 02fc 78000000 		.word	.LC7
+ 592 0300 90000000 		.word	.LC8
+ 593 0304 98000000 		.word	.LC9
+ 594 0308 A0000000 		.word	.LC10
+ 595              	.L21:
+ 210:main.c        ****                     valores_confirmados=1;
+ 596              		.loc 1 210 0
+ 597 030c 442B     		cmp	r3, #68
+ 598 030e 11D1     		bne	.L16
+ 210:main.c        ****                     valores_confirmados=1;
+ 599              		.loc 1 210 0 is_stmt 0 discriminator 1
+ 600 0310 B34B     		ldr	r3, .L40+8
+ 601 0312 5B79     		ldrb	r3, [r3, #5]	@ zero_extendqisi2
+ 602 0314 012B     		cmp	r3, #1
+ 603 0316 0DD1     		bne	.L16
+ 210:main.c        ****                     valores_confirmados=1;
+ 604              		.loc 1 210 0 discriminator 2
+ 605 0318 B14B     		ldr	r3, .L40+8
+ 606 031a 9B79     		ldrb	r3, [r3, #6]	@ zero_extendqisi2
+ 607 031c 012B     		cmp	r3, #1
+ 608 031e 09D1     		bne	.L16
+ 210:main.c        ****                     valores_confirmados=1;
+ 609              		.loc 1 210 0 discriminator 3
+ 610 0320 AF4B     		ldr	r3, .L40+8
+ 611 0322 1B7B     		ldrb	r3, [r3, #12]	@ zero_extendqisi2
+ 612 0324 012B     		cmp	r3, #1
+ 613 0326 05D1     		bne	.L16
+ 211:main.c        ****                     ingresando_valores=0;
+ 614              		.loc 1 211 0 is_stmt 1
+ 615 0328 0122     		movs	r2, #1
+ 616 032a AE4B     		ldr	r3, .L40+12
+ 617 032c 1A70     		strb	r2, [r3]
+ 212:main.c        ****                 }
+ 618              		.loc 1 212 0
+ 619 032e 0022     		movs	r2, #0
+ 620 0330 AB4B     		ldr	r3, .L40+8
+ 621 0332 1A71     		strb	r2, [r3, #4]
+ 622              	.L16:
+ 215:main.c        ****         }
+ 623              		.loc 1 215 0
+ 624 0334 0022     		movs	r2, #0
+ 625 0336 AA4B     		ldr	r3, .L40+8
+ 626 0338 1A70     		strb	r2, [r3]
+ 627              	.L12:
+ 628              	.LBE2:
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 20
+
+
+ 217:main.c        ****             //INICIA CONTENO Y 
+ 629              		.loc 1 217 0
+ 630 033a AA4B     		ldr	r3, .L40+12
+ 631 033c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 632 033e 012B     		cmp	r3, #1
+ 633 0340 08D1     		bne	.L23
+ 219:main.c        ****             mostrar_EnCilolcd=1;
+ 634              		.loc 1 219 0
+ 635 0342 A94A     		ldr	r2, .L40+16
+ 636 0344 1370     		strb	r3, [r2]
+ 220:main.c        ****             sacar_adc=1;
+ 637              		.loc 1 220 0
+ 638 0346 A94A     		ldr	r2, .L40+20
+ 639 0348 1370     		strb	r3, [r2]
+ 221:main.c        ****             valores_confirmados=0;
+ 640              		.loc 1 221 0
+ 641 034a A94A     		ldr	r2, .L40+24
+ 642 034c 1370     		strb	r3, [r2]
+ 222:main.c        ****         }
+ 643              		.loc 1 222 0
+ 644 034e 0022     		movs	r2, #0
+ 645 0350 A44B     		ldr	r3, .L40+12
+ 646 0352 1A70     		strb	r2, [r3]
+ 647              	.L23:
+ 224:main.c        ****             LCD_ClearDisplay();
+ 648              		.loc 1 224 0
+ 649 0354 A54B     		ldr	r3, .L40+20
+ 650 0356 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 651 0358 012B     		cmp	r3, #1
+ 652 035a 0CD1     		bne	.L24
+ 225:main.c        ****             LCD_Position(1,0);
+ 653              		.loc 1 225 0
+ 654 035c 0120     		movs	r0, #1
+ 655 035e FFF7FEFF 		bl	LCD_WriteControl
+ 656              	.LVL63:
+ 226:main.c        ****             LCD_PrintString("EN CICLO - NO ABRIR");
+ 657              		.loc 1 226 0
+ 658 0362 0021     		movs	r1, #0
+ 659 0364 0120     		movs	r0, #1
+ 660 0366 FFF7FEFF 		bl	LCD_Position
+ 661              	.LVL64:
+ 227:main.c        ****             mostrar_EnCilolcd=0;
+ 662              		.loc 1 227 0
+ 663 036a A248     		ldr	r0, .L40+28
+ 664 036c FFF7FEFF 		bl	LCD_PrintString
+ 665              	.LVL65:
+ 228:main.c        ****         }
+ 666              		.loc 1 228 0
+ 667 0370 0022     		movs	r2, #0
+ 668 0372 9E4B     		ldr	r3, .L40+20
+ 669 0374 1A70     		strb	r2, [r3]
+ 670              	.L24:
+ 230:main.c        ****             
+ 671              		.loc 1 230 0
+ 672 0376 9C4B     		ldr	r3, .L40+16
+ 673 0378 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 674 037a 012B     		cmp	r3, #1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 21
+
+
+ 675 037c 5ED1     		bne	.L25
+ 230:main.c        ****             
+ 676              		.loc 1 230 0 is_stmt 0 discriminator 1
+ 677 037e 984B     		ldr	r3, .L40+8
+ 678 0380 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 679 0382 012B     		cmp	r3, #1
+ 680 0384 5AD1     		bne	.L25
+ 232:main.c        ****             miliseg_crono++;
+ 681              		.loc 1 232 0 is_stmt 1
+ 682 0386 0022     		movs	r2, #0
+ 683 0388 954B     		ldr	r3, .L40+8
+ 684 038a 5A70     		strb	r2, [r3, #1]
+ 233:main.c        ****             if (miliseg_crono==1000){
+ 685              		.loc 1 233 0
+ 686 038c 9A4A     		ldr	r2, .L40+32
+ 687 038e 1388     		ldrh	r3, [r2]
+ 688 0390 0133     		adds	r3, r3, #1
+ 689 0392 9BB2     		uxth	r3, r3
+ 690 0394 1380     		strh	r3, [r2]	@ movhi
+ 234:main.c        ****                 led_Write(!led_Read());
+ 691              		.loc 1 234 0
+ 692 0396 B3F57A7F 		cmp	r3, #1000
+ 693 039a 17D1     		bne	.L26
+ 235:main.c        ****                 miliseg_crono=0;
+ 694              		.loc 1 235 0
+ 695 039c FFF7FEFF 		bl	led_Read
+ 696              	.LVL66:
+ 697 03a0 B0FA80F0 		clz	r0, r0
+ 698 03a4 4009     		lsrs	r0, r0, #5
+ 699 03a6 FFF7FEFF 		bl	led_Write
+ 700              	.LVL67:
+ 236:main.c        ****                 
+ 701              		.loc 1 236 0
+ 702 03aa 0022     		movs	r2, #0
+ 703 03ac 924B     		ldr	r3, .L40+32
+ 704 03ae 1A80     		strh	r2, [r3]	@ movhi
+ 238:main.c        ****                 if (segundos_crono==60){
+ 705              		.loc 1 238 0
+ 706 03b0 924A     		ldr	r2, .L40+36
+ 707 03b2 1388     		ldrh	r3, [r2]
+ 708 03b4 0133     		adds	r3, r3, #1
+ 709 03b6 9BB2     		uxth	r3, r3
+ 710 03b8 1380     		strh	r3, [r2]	@ movhi
+ 239:main.c        ****                     segundos_crono=0;
+ 711              		.loc 1 239 0
+ 712 03ba 3C2B     		cmp	r3, #60
+ 713 03bc 06D1     		bne	.L26
+ 240:main.c        ****                     min_crono++;
+ 714              		.loc 1 240 0
+ 715 03be 0022     		movs	r2, #0
+ 716 03c0 8E4B     		ldr	r3, .L40+36
+ 717 03c2 1A80     		strh	r2, [r3]	@ movhi
+ 241:main.c        ****                 }
+ 718              		.loc 1 241 0
+ 719 03c4 8E4A     		ldr	r2, .L40+40
+ 720 03c6 1388     		ldrh	r3, [r2]
+ 721 03c8 0133     		adds	r3, r3, #1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 22
+
+
+ 722 03ca 1380     		strh	r3, [r2]	@ movhi
+ 723              	.L26:
+ 244:main.c        ****             LED_Driver_1_Write7SegDigitDec(min_crono%10,1);
+ 724              		.loc 1 244 0
+ 725 03cc 8C4D     		ldr	r5, .L40+40
+ 726 03ce 2888     		ldrh	r0, [r5]
+ 727 03d0 8C4C     		ldr	r4, .L40+44
+ 728 03d2 A4FB0030 		umull	r3, r0, r4, r0
+ 729 03d6 0021     		movs	r1, #0
+ 730 03d8 C0F3C700 		ubfx	r0, r0, #3, #8
+ 731 03dc FFF7FEFF 		bl	LED_Driver_1_Write7SegDigitDec
+ 732              	.LVL68:
+ 245:main.c        ****             LED_Driver_1_Write7SegDigitDec(segundos_crono/10,2);
+ 733              		.loc 1 245 0
+ 734 03e0 2A88     		ldrh	r2, [r5]
+ 735 03e2 A4FB0213 		umull	r1, r3, r4, r2
+ 736 03e6 DB08     		lsrs	r3, r3, #3
+ 737 03e8 03EB8303 		add	r3, r3, r3, lsl #2
+ 738 03ec 5800     		lsls	r0, r3, #1
+ 739 03ee 101A     		subs	r0, r2, r0
+ 740 03f0 0121     		movs	r1, #1
+ 741 03f2 C0B2     		uxtb	r0, r0
+ 742 03f4 FFF7FEFF 		bl	LED_Driver_1_Write7SegDigitDec
+ 743              	.LVL69:
+ 246:main.c        ****             LED_Driver_1_Write7SegDigitDec(segundos_crono%10,3);
+ 744              		.loc 1 246 0
+ 745 03f8 804E     		ldr	r6, .L40+36
+ 746 03fa 3088     		ldrh	r0, [r6]
+ 747 03fc A4FB0030 		umull	r3, r0, r4, r0
+ 748 0400 0221     		movs	r1, #2
+ 749 0402 C0F3C700 		ubfx	r0, r0, #3, #8
+ 750 0406 FFF7FEFF 		bl	LED_Driver_1_Write7SegDigitDec
+ 751              	.LVL70:
+ 247:main.c        ****             // AQUI SE DEBE PONER EL CODIGO QUE PONGA LOS MINUTOS Y SEGUNDOS EN EL CONTADOR
+ 752              		.loc 1 247 0
+ 753 040a 3388     		ldrh	r3, [r6]
+ 754 040c A4FB0324 		umull	r2, r4, r4, r3
+ 755 0410 E408     		lsrs	r4, r4, #3
+ 756 0412 04EB8404 		add	r4, r4, r4, lsl #2
+ 757 0416 6000     		lsls	r0, r4, #1
+ 758 0418 181A     		subs	r0, r3, r0
+ 759 041a 0321     		movs	r1, #3
+ 760 041c C0B2     		uxtb	r0, r0
+ 761 041e FFF7FEFF 		bl	LED_Driver_1_Write7SegDigitDec
+ 762              	.LVL71:
+ 250:main.c        ****                 encender_alarma_ambas=1;
+ 763              		.loc 1 250 0
+ 764 0422 2A88     		ldrh	r2, [r5]
+ 765 0424 6F4B     		ldr	r3, .L40+12
+ 766 0426 9B68     		ldr	r3, [r3, #8]
+ 767 0428 9A42     		cmp	r2, r3
+ 768 042a 07D1     		bne	.L25
+ 251:main.c        ****                 iniciar_conteo=0;
+ 769              		.loc 1 251 0
+ 770 042c 0122     		movs	r2, #1
+ 771 042e 764B     		ldr	r3, .L40+48
+ 772 0430 1A70     		strb	r2, [r3]
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 23
+
+
+ 252:main.c        ****                 ciclo_acabado=0;
+ 773              		.loc 1 252 0
+ 774 0432 0023     		movs	r3, #0
+ 775 0434 6C4A     		ldr	r2, .L40+16
+ 776 0436 1370     		strb	r3, [r2]
+ 253:main.c        ****             }
+ 777              		.loc 1 253 0
+ 778 0438 744A     		ldr	r2, .L40+52
+ 779 043a 1370     		strb	r3, [r2]
+ 780              	.L25:
+ 257:main.c        ****             LCD_CLEAR_DISPLAY;
+ 781              		.loc 1 257 0
+ 782 043c 734B     		ldr	r3, .L40+52
+ 783 043e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 784 0440 012B     		cmp	r3, #1
+ 785 0442 06D1     		bne	.L27
+ 259:main.c        ****             LCD_PrintString("RETIRE LAS MUESTRAS");
+ 786              		.loc 1 259 0
+ 787 0444 0021     		movs	r1, #0
+ 788 0446 0120     		movs	r0, #1
+ 789 0448 FFF7FEFF 		bl	LCD_Position
+ 790              	.LVL72:
+ 260:main.c        ****         }
+ 791              		.loc 1 260 0
+ 792 044c 7048     		ldr	r0, .L40+56
+ 793 044e FFF7FEFF 		bl	LCD_PrintString
+ 794              	.LVL73:
+ 795              	.L27:
+ 262:main.c        ****             if (ms2==1){// entra aqui cada ms
+ 796              		.loc 1 262 0
+ 797 0452 674B     		ldr	r3, .L40+24
+ 798 0454 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 799 0456 012B     		cmp	r3, #1
+ 800 0458 7FF4FAAD 		bne	.L28
+ 263:main.c        ****                 ms2=0;
+ 801              		.loc 1 263 0
+ 802 045c 604B     		ldr	r3, .L40+8
+ 803 045e 9B78     		ldrb	r3, [r3, #2]	@ zero_extendqisi2
+ 804 0460 012B     		cmp	r3, #1
+ 805 0462 40F08180 		bne	.L29
+ 264:main.c        ****                 contador_muestras++;
+ 806              		.loc 1 264 0
+ 807 0466 5E4A     		ldr	r2, .L40+8
+ 808 0468 0023     		movs	r3, #0
+ 809 046a 9370     		strb	r3, [r2, #2]
+ 265:main.c        ****                 if (contador_muestras%25 == 0){ // entra aqui cada 25 ms
+ 810              		.loc 1 265 0
+ 811 046c D389     		ldrh	r3, [r2, #14]
+ 812 046e 0133     		adds	r3, r3, #1
+ 813 0470 9BB2     		uxth	r3, r3
+ 814 0472 D381     		strh	r3, [r2, #14]	@ movhi
+ 266:main.c        ****                     
+ 815              		.loc 1 266 0
+ 816 0474 674A     		ldr	r2, .L40+60
+ 817 0476 A2FB0312 		umull	r1, r2, r2, r3
+ 818 047a D208     		lsrs	r2, r2, #3
+ 819 047c 02EB8202 		add	r2, r2, r2, lsl #2
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 24
+
+
+ 820 0480 02EB8202 		add	r2, r2, r2, lsl #2
+ 821 0484 9B1A     		subs	r3, r3, r2
+ 822 0486 9BB2     		uxth	r3, r3
+ 823 0488 002B     		cmp	r3, #0
+ 824 048a 6DD1     		bne	.L29
+ 269:main.c        ****                     ADC_StartConvert();
+ 825              		.loc 1 269 0
+ 826 048c 0120     		movs	r0, #1
+ 827 048e FFF7FEFF 		bl	AMux_1_Select
+ 828              	.LVL74:
+ 270:main.c        ****                     while(!ADC_IsEndConversion(ADC_RETURN_STATUS)){}
+ 829              		.loc 1 270 0
+ 830 0492 FFF7FEFF 		bl	ADC_StartConvert
+ 831              	.LVL75:
+ 832              	.L30:
+ 271:main.c        ****                     senal_hume=ADC_GetResult16();
+ 833              		.loc 1 271 0 discriminator 1
+ 834 0496 0120     		movs	r0, #1
+ 835 0498 FFF7FEFF 		bl	ADC_IsEndConversion
+ 836              	.LVL76:
+ 837 049c 0028     		cmp	r0, #0
+ 838 049e FAD0     		beq	.L30
+ 272:main.c        ****                     senal_hume=ADC_CountsTo_mVolts(senal_hume);
+ 839              		.loc 1 272 0
+ 840 04a0 FFF7FEFF 		bl	ADC_GetResult16
+ 841              	.LVL77:
+ 842 04a4 4E4C     		ldr	r4, .L40+8
+ 843 04a6 2082     		strh	r0, [r4, #16]	@ movhi
+ 273:main.c        ****                     ADC_StopConvert();
+ 844              		.loc 1 273 0
+ 845 04a8 FFF7FEFF 		bl	ADC_CountsTo_mVolts
+ 846              	.LVL78:
+ 847 04ac 2082     		strh	r0, [r4, #16]	@ movhi
+ 274:main.c        ****                     milivolt_h=(milivolt_h+senal_hume);
+ 848              		.loc 1 274 0
+ 849 04ae FFF7FEFF 		bl	ADC_StopConvert
+ 850              	.LVL79:
+ 275:main.c        ****                     
+ 851              		.loc 1 275 0
+ 852 04b2 228A     		ldrh	r2, [r4, #16]
+ 853 04b4 6369     		ldr	r3, [r4, #20]
+ 854 04b6 1344     		add	r3, r3, r2
+ 855 04b8 6361     		str	r3, [r4, #20]
+ 277:main.c        ****                     ADC_StartConvert();
+ 856              		.loc 1 277 0
+ 857 04ba 0020     		movs	r0, #0
+ 858 04bc FFF7FEFF 		bl	AMux_1_Select
+ 859              	.LVL80:
+ 278:main.c        ****                     while(!ADC_IsEndConversion(ADC_RETURN_STATUS)){}
+ 860              		.loc 1 278 0
+ 861 04c0 FFF7FEFF 		bl	ADC_StartConvert
+ 862              	.LVL81:
+ 863              	.L31:
+ 279:main.c        ****                     senal_temp=ADC_GetResult16();
+ 864              		.loc 1 279 0 discriminator 1
+ 865 04c4 0120     		movs	r0, #1
+ 866 04c6 FFF7FEFF 		bl	ADC_IsEndConversion
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 25
+
+
+ 867              	.LVL82:
+ 868 04ca 0028     		cmp	r0, #0
+ 869 04cc FAD0     		beq	.L31
+ 280:main.c        ****                     senal_temp=ADC_CountsTo_mVolts(senal_temp);
+ 870              		.loc 1 280 0
+ 871 04ce FFF7FEFF 		bl	ADC_GetResult16
+ 872              	.LVL83:
+ 873 04d2 434C     		ldr	r4, .L40+8
+ 874 04d4 2083     		strh	r0, [r4, #24]	@ movhi
+ 281:main.c        ****                     ADC_StopConvert();
+ 875              		.loc 1 281 0
+ 876 04d6 FFF7FEFF 		bl	ADC_CountsTo_mVolts
+ 877              	.LVL84:
+ 878 04da 2083     		strh	r0, [r4, #24]	@ movhi
+ 282:main.c        ****                     milivolt_temp=milivolt_temp+senal_temp;
+ 879              		.loc 1 282 0
+ 880 04dc FFF7FEFF 		bl	ADC_StopConvert
+ 881              	.LVL85:
+ 283:main.c        ****                     
+ 882              		.loc 1 283 0
+ 883 04e0 228B     		ldrh	r2, [r4, #24]
+ 884 04e2 E369     		ldr	r3, [r4, #28]
+ 885 04e4 1344     		add	r3, r3, r2
+ 886 04e6 E361     		str	r3, [r4, #28]
+ 285:main.c        ****                         contador_muestras=0; // se resetea la bandera
+ 887              		.loc 1 285 0
+ 888 04e8 E289     		ldrh	r2, [r4, #14]
+ 889 04ea B2F5FA7F 		cmp	r2, #500
+ 890 04ee 3BD1     		bne	.L29
+ 286:main.c        ****                         milivolt_h=milivolt_h/20; // se saca el promedio de las 20 muetras del peso
+ 891              		.loc 1 286 0
+ 892 04f0 0025     		movs	r5, #0
+ 893 04f2 E581     		strh	r5, [r4, #14]	@ movhi
+ 287:main.c        ****                         milivolt_temp=milivolt_temp/20;// se saca el promedio de las 20 muestras de
+ 894              		.loc 1 287 0
+ 895 04f4 6269     		ldr	r2, [r4, #20]
+ 896 04f6 4348     		ldr	r0, .L40+44
+ 897 04f8 A0FB0212 		umull	r1, r2, r0, r2
+ 898 04fc 1209     		lsrs	r2, r2, #4
+ 899 04fe 6261     		str	r2, [r4, #20]
+ 288:main.c        ****                             
+ 900              		.loc 1 288 0
+ 901 0500 A0FB0313 		umull	r1, r3, r0, r3
+ 902 0504 1809     		lsrs	r0, r3, #4
+ 903 0506 E061     		str	r0, [r4, #28]
+ 290:main.c        ****                         temperatura_medida=milivolt_temp*0.036;
+ 904              		.loc 1 290 0
+ 905 0508 424B     		ldr	r3, .L40+60
+ 906 050a A3FB0223 		umull	r2, r3, r3, r2
+ 907 050e 1B09     		lsrs	r3, r3, #4
+ 908 0510 414F     		ldr	r7, .L40+64
+ 909 0512 3B80     		strh	r3, [r7]	@ movhi
+ 291:main.c        ****                              
+ 910              		.loc 1 291 0
+ 911 0514 FFF7FEFF 		bl	__aeabi_ui2d
+ 912              	.LVL86:
+ 913 0518 2FA3     		adr	r3, .L40
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 26
+
+
+ 914 051a D3E90023 		ldrd	r2, [r3]
+ 915 051e FFF7FEFF 		bl	__aeabi_dmul
+ 916              	.LVL87:
+ 917 0522 3E4E     		ldr	r6, .L40+68
+ 918 0524 FFF7FEFF 		bl	__aeabi_d2uiz
+ 919              	.LVL88:
+ 920 0528 3080     		strh	r0, [r6]	@ movhi
+ 293:main.c        ****                         LCD_PrintString("humedad= ");
+ 921              		.loc 1 293 0
+ 922 052a 2946     		mov	r1, r5
+ 923 052c 0220     		movs	r0, #2
+ 924 052e FFF7FEFF 		bl	LCD_Position
+ 925              	.LVL89:
+ 294:main.c        ****                         LCD_PrintNumber(humedad_medida);
+ 926              		.loc 1 294 0
+ 927 0532 3B48     		ldr	r0, .L40+72
+ 928 0534 FFF7FEFF 		bl	LCD_PrintString
+ 929              	.LVL90:
+ 295:main.c        ****                         LCD_PrintString("%  ");
+ 930              		.loc 1 295 0
+ 931 0538 3888     		ldrh	r0, [r7]
+ 932 053a FFF7FEFF 		bl	LCD_PrintU32Number
+ 933              	.LVL91:
+ 296:main.c        ****                         milivolt_h=0;
+ 934              		.loc 1 296 0
+ 935 053e 3948     		ldr	r0, .L40+76
+ 936 0540 FFF7FEFF 		bl	LCD_PrintString
+ 937              	.LVL92:
+ 297:main.c        ****                         
+ 938              		.loc 1 297 0
+ 939 0544 6561     		str	r5, [r4, #20]
+ 299:main.c        ****                         LCD_PrintString("Temp= ");
+ 940              		.loc 1 299 0
+ 941 0546 2946     		mov	r1, r5
+ 942 0548 0320     		movs	r0, #3
+ 943 054a FFF7FEFF 		bl	LCD_Position
+ 944              	.LVL93:
+ 300:main.c        ****                         LCD_PrintNumber(temperatura_medida);
+ 945              		.loc 1 300 0
+ 946 054e 3648     		ldr	r0, .L40+80
+ 947 0550 FFF7FEFF 		bl	LCD_PrintString
+ 948              	.LVL94:
+ 301:main.c        ****                         LCD_PutChar(LCD_CUSTOM_0);
+ 949              		.loc 1 301 0
+ 950 0554 3088     		ldrh	r0, [r6]
+ 951 0556 FFF7FEFF 		bl	LCD_PrintU32Number
+ 952              	.LVL95:
+ 302:main.c        ****                         LCD_PrintString("F   ");
+ 953              		.loc 1 302 0
+ 954 055a 2846     		mov	r0, r5
+ 955 055c FFF7FEFF 		bl	LCD_PutChar
+ 956              	.LVL96:
+ 303:main.c        ****                         milivolt_temp=0;
+ 957              		.loc 1 303 0
+ 958 0560 3248     		ldr	r0, .L40+84
+ 959 0562 FFF7FEFF 		bl	LCD_PrintString
+ 960              	.LVL97:
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 27
+
+
+ 304:main.c        ****                     }
+ 961              		.loc 1 304 0
+ 962 0566 E561     		str	r5, [r4, #28]
+ 963              	.L29:
+ 308:main.c        ****                 alarma_temPeligro=1;
+ 964              		.loc 1 308 0
+ 965 0568 2C4B     		ldr	r3, .L40+68
+ 966 056a 1888     		ldrh	r0, [r3]
+ 967 056c 1D4B     		ldr	r3, .L40+12
+ 968 056e 9989     		ldrh	r1, [r3, #12]
+ 969 0570 8842     		cmp	r0, r1
+ 970 0572 08D9     		bls	.L32
+ 308:main.c        ****                 alarma_temPeligro=1;
+ 971              		.loc 1 308 0 is_stmt 0 discriminator 1
+ 972 0574 1A4B     		ldr	r3, .L40+8
+ 973 0576 93F82030 		ldrb	r3, [r3, #32]	@ zero_extendqisi2
+ 974 057a 23B9     		cbnz	r3, .L32
+ 309:main.c        ****             }
+ 975              		.loc 1 309 0 is_stmt 1
+ 976 057c 0122     		movs	r2, #1
+ 977 057e 184B     		ldr	r3, .L40+8
+ 978 0580 83F82120 		strb	r2, [r3, #33]
+ 979 0584 03E0     		b	.L33
+ 980              	.L32:
+ 312:main.c        ****             }
+ 981              		.loc 1 312 0
+ 982 0586 0022     		movs	r2, #0
+ 983 0588 154B     		ldr	r3, .L40+8
+ 984 058a 83F82120 		strb	r2, [r3, #33]
+ 985              	.L33:
+ 314:main.c        ****                 alarma_humPeligro=1;
+ 986              		.loc 1 314 0
+ 987 058e 224B     		ldr	r3, .L40+64
+ 988 0590 1A88     		ldrh	r2, [r3]
+ 989 0592 144B     		ldr	r3, .L40+12
+ 990 0594 DB89     		ldrh	r3, [r3, #14]
+ 991 0596 9A42     		cmp	r2, r3
+ 992 0598 08D9     		bls	.L34
+ 314:main.c        ****                 alarma_humPeligro=1;
+ 993              		.loc 1 314 0 is_stmt 0 discriminator 1
+ 994 059a 114C     		ldr	r4, .L40+8
+ 995 059c 94F82040 		ldrb	r4, [r4, #32]	@ zero_extendqisi2
+ 996 05a0 24B9     		cbnz	r4, .L34
+ 315:main.c        ****             }
+ 997              		.loc 1 315 0 is_stmt 1
+ 998 05a2 0125     		movs	r5, #1
+ 999 05a4 0E4C     		ldr	r4, .L40+8
+ 1000 05a6 84F82250 		strb	r5, [r4, #34]
+ 1001 05aa 03E0     		b	.L35
+ 1002              	.L34:
+ 318:main.c        ****             }
+ 1003              		.loc 1 318 0
+ 1004 05ac 0025     		movs	r5, #0
+ 1005 05ae 0C4C     		ldr	r4, .L40+8
+ 1006 05b0 84F82250 		strb	r5, [r4, #34]
+ 1007              	.L35:
+ 320:main.c        ****                 alarma_ambasPeligro=1;
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 28
+
+
+ 1008              		.loc 1 320 0
+ 1009 05b4 9A42     		cmp	r2, r3
+ 1010 05b6 7FF64BAD 		bls	.L28
+ 320:main.c        ****                 alarma_ambasPeligro=1;
+ 1011              		.loc 1 320 0 is_stmt 0 discriminator 1
+ 1012 05ba 8842     		cmp	r0, r1
+ 1013 05bc 7FF648AD 		bls	.L28
+ 320:main.c        ****                 alarma_ambasPeligro=1;
+ 1014              		.loc 1 320 0 discriminator 2
+ 1015 05c0 074B     		ldr	r3, .L40+8
+ 1016 05c2 93F82030 		ldrb	r3, [r3, #32]	@ zero_extendqisi2
+ 1017 05c6 002B     		cmp	r3, #0
+ 1018 05c8 7FF442AD 		bne	.L28
+ 321:main.c        ****             }
+ 1019              		.loc 1 321 0 is_stmt 1
+ 1020 05cc 0122     		movs	r2, #1
+ 1021 05ce 044B     		ldr	r3, .L40+8
+ 1022 05d0 83F82320 		strb	r2, [r3, #35]
+ 1023 05d4 3CE5     		b	.L28
+ 1024              	.L41:
+ 1025 05d6 00BF     		.align	3
+ 1026              	.L40:
+ 1027 05d8 3BDF4F8D 		.word	-1924145349
+ 1028 05dc 976EA23F 		.word	1067609751
+ 1029 05e0 00000000 		.word	.LANCHOR0
+ 1030 05e4 00000000 		.word	.LANCHOR1
+ 1031 05e8 00000000 		.word	iniciar_conteo
+ 1032 05ec 00000000 		.word	mostrar_EnCilolcd
+ 1033 05f0 00000000 		.word	sacar_adc
+ 1034 05f4 A8000000 		.word	.LC11
+ 1035 05f8 00000000 		.word	miliseg_crono
+ 1036 05fc 00000000 		.word	segundos_crono
+ 1037 0600 00000000 		.word	min_crono
+ 1038 0604 CDCCCCCC 		.word	-858993459
+ 1039 0608 00000000 		.word	encender_alarma_ambas
+ 1040 060c 00000000 		.word	ciclo_acabado
+ 1041 0610 BC000000 		.word	.LC12
+ 1042 0614 1F85EB51 		.word	1374389535
+ 1043 0618 00000000 		.word	humedad_medida
+ 1044 061c 00000000 		.word	temperatura_medida
+ 1045 0620 D0000000 		.word	.LC13
+ 1046 0624 DC000000 		.word	.LC14
+ 1047 0628 E0000000 		.word	.LC15
+ 1048 062c E8000000 		.word	.LC16
+ 1049              		.cfi_endproc
+ 1050              	.LFE63:
+ 1051              		.size	main, .-main
+ 1052              		.section	.text.CompararClave,"ax",%progbits
+ 1053              		.align	2
+ 1054              		.global	CompararClave
+ 1055              		.thumb
+ 1056              		.thumb_func
+ 1057              		.type	CompararClave, %function
+ 1058              	CompararClave:
+ 1059              	.LFB67:
+ 344:main.c        ****     
+ 345:main.c        ****     
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 29
+
+
+ 346:main.c        **** }
+ 347:main.c        **** 
+ 348:main.c        **** uint8 CompararClave(const uint8 *Ingresada, const uint8 *Original){ // Función para comparar clave
+ 1060              		.loc 1 348 0
+ 1061              		.cfi_startproc
+ 1062              		@ args = 0, pretend = 0, frame = 0
+ 1063              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1064              		@ link register save eliminated.
+ 1065              	.LVL98:
+ 1066 0000 30B4     		push	{r4, r5}
+ 1067              		.cfi_def_cfa_offset 8
+ 1068              		.cfi_offset 4, -8
+ 1069              		.cfi_offset 5, -4
+ 1070              	.LVL99:
+ 349:main.c        ****     uint8 Aciertos=0;
+ 350:main.c        ****     uint8 m=0;
+ 351:main.c        ****     for(m=0;m<4;m++){
+ 1071              		.loc 1 351 0
+ 1072 0002 0023     		movs	r3, #0
+ 349:main.c        ****     uint8 Aciertos=0;
+ 1073              		.loc 1 349 0
+ 1074 0004 1D46     		mov	r5, r3
+ 1075              		.loc 1 351 0
+ 1076 0006 09E0     		b	.L43
+ 1077              	.LVL100:
+ 1078              	.L45:
+ 352:main.c        ****         if(*Ingresada==*Original){
+ 1079              		.loc 1 352 0
+ 1080 0008 0478     		ldrb	r4, [r0]	@ zero_extendqisi2
+ 1081 000a 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 1082 000c 9442     		cmp	r4, r2
+ 1083 000e 01D1     		bne	.L44
+ 353:main.c        ****             Aciertos++;
+ 1084              		.loc 1 353 0
+ 1085 0010 0135     		adds	r5, r5, #1
+ 1086              	.LVL101:
+ 1087 0012 EDB2     		uxtb	r5, r5
+ 1088              	.LVL102:
+ 1089              	.L44:
+ 354:main.c        ****         }
+ 355:main.c        ****     Ingresada++;
+ 1090              		.loc 1 355 0 discriminator 2
+ 1091 0014 0130     		adds	r0, r0, #1
+ 1092              	.LVL103:
+ 356:main.c        ****     Original++;
+ 1093              		.loc 1 356 0 discriminator 2
+ 1094 0016 0131     		adds	r1, r1, #1
+ 1095              	.LVL104:
+ 351:main.c        ****         if(*Ingresada==*Original){
+ 1096              		.loc 1 351 0 discriminator 2
+ 1097 0018 0133     		adds	r3, r3, #1
+ 1098              	.LVL105:
+ 1099 001a DBB2     		uxtb	r3, r3
+ 1100              	.LVL106:
+ 1101              	.L43:
+ 351:main.c        ****         if(*Ingresada==*Original){
+ 1102              		.loc 1 351 0 is_stmt 0 discriminator 1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 30
+
+
+ 1103 001c 032B     		cmp	r3, #3
+ 1104 001e F3D9     		bls	.L45
+ 357:main.c        ****     }    
+ 358:main.c        ****     if (Aciertos==4){ // Solo si la clave esta totalmente buena retorna 1
+ 1105              		.loc 1 358 0 is_stmt 1
+ 1106 0020 042D     		cmp	r5, #4
+ 1107 0022 01D1     		bne	.L47
+ 359:main.c        ****      return 1;
+ 1108              		.loc 1 359 0
+ 1109 0024 0120     		movs	r0, #1
+ 1110              	.LVL107:
+ 1111 0026 00E0     		b	.L46
+ 1112              	.LVL108:
+ 1113              	.L47:
+ 360:main.c        ****     }
+ 361:main.c        ****     else{
+ 362:main.c        ****     return 0;
+ 1114              		.loc 1 362 0
+ 1115 0028 0020     		movs	r0, #0
+ 1116              	.LVL109:
+ 1117              	.L46:
+ 363:main.c        ****     }
+ 364:main.c        **** }
+ 1118              		.loc 1 364 0
+ 1119 002a 30BC     		pop	{r4, r5}
+ 1120              		.cfi_restore 5
+ 1121              		.cfi_restore 4
+ 1122              		.cfi_def_cfa_offset 0
+ 1123              	.LVL110:
+ 1124 002c 7047     		bx	lr
+ 1125              		.cfi_endproc
+ 1126              	.LFE67:
+ 1127              		.size	CompararClave, .-CompararClave
+ 1128              		.global	apagador_alarma
+ 1129              		.comm	Start,12,4
+ 1130              		.comm	temperatura_medida,2,2
+ 1131              		.comm	humedad_medida,2,2
+ 1132              		.global	SEGUNDOS
+ 1133              		.comm	bot1,1,1
+ 1134              		.global	contador_muestras
+ 1135              		.comm	encender_alarma_ambas,1,1
+ 1136              		.global	alarma_yapasotiempo
+ 1137              		.global	alarma_ambasPeligro
+ 1138              		.global	alarma_humPeligro
+ 1139              		.global	alarma_temPeligro
+ 1140              		.global	limite_hum
+ 1141              		.global	limite_temp
+ 1142              		.comm	sacar_adc,1,1
+ 1143              		.comm	mostrar_EnCilolcd,1,1
+ 1144              		.comm	iniciar_conteo,1,1
+ 1145              		.comm	miliseg_crono,2,2
+ 1146              		.comm	segundos_crono,2,2
+ 1147              		.comm	min_crono,2,2
+ 1148              		.global	valores_confirmados
+ 1149              		.global	tiempo_in
+ 1150              		.global	humedad_in
+ 1151              		.global	temp_in
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 31
+
+
+ 1152              		.global	tiempo_anadido
+ 1153              		.global	humedad_anadida
+ 1154              		.global	temperatura_anadida
+ 1155              		.global	ingresando_valores
+ 1156              		.comm	humedad,2,2
+ 1157              		.comm	temp,2,2
+ 1158              		.global	ClaveOriginal
+ 1159              		.comm	ClaveIngresada,4,4
+ 1160              		.global	puerta_cerrada
+ 1161              		.global	finishpass
+ 1162              		.global	milivolt_temp
+ 1163              		.global	milivolt_h
+ 1164              		.global	senal_temp
+ 1165              		.global	senal_hume
+ 1166              		.comm	ciclo_acabado,1,1
+ 1167              		.global	comparado
+ 1168              		.global	counterOut
+ 1169              		.global	salida
+ 1170              		.global	ESCORRECTO
+ 1171              		.global	ohno
+ 1172              		.global	correcto
+ 1173              		.global	add
+ 1174              		.global	ms2
+ 1175              		.global	ms1
+ 1176              		.global	pos
+ 1177              		.global	tecladoband
+ 1178              		.global	potband
+ 1179              		.global	countpot
+ 1180              		.comm	tecla,1,1
+ 1181              		.global	angulo
+ 1182              		.global	tipounidad
+ 1183              		.global	valpot
+ 1184 002e 00BF     		.data
+ 1185              		.align	2
+ 1186              		.set	.LANCHOR1,. + 0
+ 1187              		.type	valores_confirmados, %object
+ 1188              		.size	valores_confirmados, 1
+ 1189              	valores_confirmados:
+ 1190 0000 01       		.byte	1
+ 1191 0001 000000   		.space	3
+ 1192              		.type	temp_in, %object
+ 1193              		.size	temp_in, 4
+ 1194              	temp_in:
+ 1195 0004 02000000 		.word	2
+ 1196              		.type	tiempo_in, %object
+ 1197              		.size	tiempo_in, 4
+ 1198              	tiempo_in:
+ 1199 0008 02000000 		.word	2
+ 1200              		.type	limite_temp, %object
+ 1201              		.size	limite_temp, 2
+ 1202              	limite_temp:
+ 1203 000c 7800     		.short	120
+ 1204              		.type	limite_hum, %object
+ 1205              		.size	limite_hum, 2
+ 1206              	limite_hum:
+ 1207 000e 5000     		.short	80
+ 1208              		.type	ClaveOriginal, %object
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 32
+
+
+ 1209              		.size	ClaveOriginal, 4
+ 1210              	ClaveOriginal:
+ 1211 0010 01       		.byte	1
+ 1212 0011 02       		.byte	2
+ 1213 0012 02       		.byte	2
+ 1214 0013 03       		.byte	3
+ 1215              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 1216              		.align	2
+ 1217              	.LC0:
+ 1218 0000 494E4355 		.ascii	"INCUBADORA LISTA\000"
+ 1218      4241444F 
+ 1218      5241204C 
+ 1218      49535441 
+ 1218      00
+ 1219 0011 000000   		.space	3
+ 1220              	.LC1:
+ 1221 0014 43202D20 		.ascii	"C - CERRAR PUERTA\000"
+ 1221      43455252 
+ 1221      41522050 
+ 1221      55455254 
+ 1221      4100
+ 1222 0026 0000     		.space	2
+ 1223              	.LC2:
+ 1224 0028 42202D20 		.ascii	"B - CONFIGURAR\000"
+ 1224      434F4E46 
+ 1224      49475552 
+ 1224      415200
+ 1225 0037 00       		.space	1
+ 1226              	.LC3:
+ 1227 0038 50756572 		.ascii	"Puerta cerrada\000"
+ 1227      74612063 
+ 1227      65727261 
+ 1227      646100
+ 1228 0047 00       		.space	1
+ 1229              	.LC4:
+ 1230 0048 41202D20 		.ascii	"A - ABRIR PUERTA\000"
+ 1230      41425249 
+ 1230      52205055 
+ 1230      45525441 
+ 1230      00
+ 1231 0059 000000   		.space	3
+ 1232              	.LC5:
+ 1233 005c 50756572 		.ascii	"Puerta abierta\000"
+ 1233      74612061 
+ 1233      62696572 
+ 1233      746100
+ 1234 006b 00       		.space	1
+ 1235              	.LC6:
+ 1236 006c 43202D20 		.ascii	"C - CERRAR\000"
+ 1236      43455252 
+ 1236      415200
+ 1237 0077 00       		.space	1
+ 1238              	.LC7:
+ 1239 0078 496E6772 		.ascii	"Ingrese los valores:\000"
+ 1239      65736520 
+ 1239      6C6F7320 
+ 1239      76616C6F 
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 33
+
+
+ 1239      7265733A 
+ 1240 008d 000000   		.space	3
+ 1241              	.LC8:
+ 1242 0090 54454D50 		.ascii	"TEMP: \000"
+ 1242      3A2000
+ 1243 0097 00       		.space	1
+ 1244              	.LC9:
+ 1245 0098 48554D45 		.ascii	"HUME: \000"
+ 1245      3A2000
+ 1246 009f 00       		.space	1
+ 1247              	.LC10:
+ 1248 00a0 54696D65 		.ascii	"Time: \000"
+ 1248      3A2000
+ 1249 00a7 00       		.space	1
+ 1250              	.LC11:
+ 1251 00a8 454E2043 		.ascii	"EN CICLO - NO ABRIR\000"
+ 1251      49434C4F 
+ 1251      202D204E 
+ 1251      4F204142 
+ 1251      52495200 
+ 1252              	.LC12:
+ 1253 00bc 52455449 		.ascii	"RETIRE LAS MUESTRAS\000"
+ 1253      5245204C 
+ 1253      4153204D 
+ 1253      55455354 
+ 1253      52415300 
+ 1254              	.LC13:
+ 1255 00d0 68756D65 		.ascii	"humedad= \000"
+ 1255      6461643D 
+ 1255      2000
+ 1256 00da 0000     		.space	2
+ 1257              	.LC14:
+ 1258 00dc 25202000 		.ascii	"%  \000"
+ 1259              	.LC15:
+ 1260 00e0 54656D70 		.ascii	"Temp= \000"
+ 1260      3D2000
+ 1261 00e7 00       		.space	1
+ 1262              	.LC16:
+ 1263 00e8 46202020 		.ascii	"F   \000"
+ 1263      00
+ 1264              		.bss
+ 1265              		.align	2
+ 1266              		.set	.LANCHOR0,. + 0
+ 1267              		.type	add, %object
+ 1268              		.size	add, 1
+ 1269              	add:
+ 1270 0000 00       		.space	1
+ 1271              		.type	ms1, %object
+ 1272              		.size	ms1, 1
+ 1273              	ms1:
+ 1274 0001 00       		.space	1
+ 1275              		.type	ms2, %object
+ 1276              		.size	ms2, 1
+ 1277              	ms2:
+ 1278 0002 00       		.space	1
+ 1279              		.type	puerta_cerrada, %object
+ 1280              		.size	puerta_cerrada, 1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 34
+
+
+ 1281              	puerta_cerrada:
+ 1282 0003 00       		.space	1
+ 1283              		.type	ingresando_valores, %object
+ 1284              		.size	ingresando_valores, 1
+ 1285              	ingresando_valores:
+ 1286 0004 00       		.space	1
+ 1287              		.type	temperatura_anadida, %object
+ 1288              		.size	temperatura_anadida, 1
+ 1289              	temperatura_anadida:
+ 1290 0005 00       		.space	1
+ 1291              		.type	humedad_anadida, %object
+ 1292              		.size	humedad_anadida, 1
+ 1293              	humedad_anadida:
+ 1294 0006 00       		.space	1
+ 1295 0007 00       		.space	1
+ 1296              		.type	humedad_in, %object
+ 1297              		.size	humedad_in, 4
+ 1298              	humedad_in:
+ 1299 0008 00000000 		.space	4
+ 1300              		.type	tiempo_anadido, %object
+ 1301              		.size	tiempo_anadido, 1
+ 1302              	tiempo_anadido:
+ 1303 000c 00       		.space	1
+ 1304 000d 00       		.space	1
+ 1305              		.type	contador_muestras, %object
+ 1306              		.size	contador_muestras, 2
+ 1307              	contador_muestras:
+ 1308 000e 0000     		.space	2
+ 1309              		.type	senal_hume, %object
+ 1310              		.size	senal_hume, 2
+ 1311              	senal_hume:
+ 1312 0010 0000     		.space	2
+ 1313 0012 0000     		.space	2
+ 1314              		.type	milivolt_h, %object
+ 1315              		.size	milivolt_h, 4
+ 1316              	milivolt_h:
+ 1317 0014 00000000 		.space	4
+ 1318              		.type	senal_temp, %object
+ 1319              		.size	senal_temp, 2
+ 1320              	senal_temp:
+ 1321 0018 0000     		.space	2
+ 1322 001a 0000     		.space	2
+ 1323              		.type	milivolt_temp, %object
+ 1324              		.size	milivolt_temp, 4
+ 1325              	milivolt_temp:
+ 1326 001c 00000000 		.space	4
+ 1327              		.type	apagador_alarma, %object
+ 1328              		.size	apagador_alarma, 1
+ 1329              	apagador_alarma:
+ 1330 0020 00       		.space	1
+ 1331              		.type	alarma_temPeligro, %object
+ 1332              		.size	alarma_temPeligro, 1
+ 1333              	alarma_temPeligro:
+ 1334 0021 00       		.space	1
+ 1335              		.type	alarma_humPeligro, %object
+ 1336              		.size	alarma_humPeligro, 1
+ 1337              	alarma_humPeligro:
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 35
+
+
+ 1338 0022 00       		.space	1
+ 1339              		.type	alarma_ambasPeligro, %object
+ 1340              		.size	alarma_ambasPeligro, 1
+ 1341              	alarma_ambasPeligro:
+ 1342 0023 00       		.space	1
+ 1343              		.type	SEGUNDOS, %object
+ 1344              		.size	SEGUNDOS, 2
+ 1345              	SEGUNDOS:
+ 1346 0024 0000     		.space	2
+ 1347              		.type	alarma_yapasotiempo, %object
+ 1348              		.size	alarma_yapasotiempo, 1
+ 1349              	alarma_yapasotiempo:
+ 1350 0026 00       		.space	1
+ 1351              		.type	finishpass, %object
+ 1352              		.size	finishpass, 1
+ 1353              	finishpass:
+ 1354 0027 00       		.space	1
+ 1355              		.type	comparado, %object
+ 1356              		.size	comparado, 1
+ 1357              	comparado:
+ 1358 0028 00       		.space	1
+ 1359 0029 000000   		.space	3
+ 1360              		.type	counterOut, %object
+ 1361              		.size	counterOut, 4
+ 1362              	counterOut:
+ 1363 002c 00000000 		.space	4
+ 1364              		.type	salida, %object
+ 1365              		.size	salida, 1
+ 1366              	salida:
+ 1367 0030 00       		.space	1
+ 1368              		.type	ESCORRECTO, %object
+ 1369              		.size	ESCORRECTO, 1
+ 1370              	ESCORRECTO:
+ 1371 0031 00       		.space	1
+ 1372              		.type	ohno, %object
+ 1373              		.size	ohno, 1
+ 1374              	ohno:
+ 1375 0032 00       		.space	1
+ 1376              		.type	correcto, %object
+ 1377              		.size	correcto, 1
+ 1378              	correcto:
+ 1379 0033 00       		.space	1
+ 1380              		.type	pos, %object
+ 1381              		.size	pos, 1
+ 1382              	pos:
+ 1383 0034 00       		.space	1
+ 1384              		.type	tecladoband, %object
+ 1385              		.size	tecladoband, 1
+ 1386              	tecladoband:
+ 1387 0035 00       		.space	1
+ 1388              		.type	potband, %object
+ 1389              		.size	potband, 1
+ 1390              	potband:
+ 1391 0036 00       		.space	1
+ 1392              		.type	countpot, %object
+ 1393              		.size	countpot, 1
+ 1394              	countpot:
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 36
+
+
+ 1395 0037 00       		.space	1
+ 1396              		.type	angulo, %object
+ 1397              		.size	angulo, 4
+ 1398              	angulo:
+ 1399 0038 00000000 		.space	4
+ 1400              		.type	tipounidad, %object
+ 1401              		.size	tipounidad, 1
+ 1402              	tipounidad:
+ 1403 003c 00       		.space	1
+ 1404 003d 00       		.space	1
+ 1405              		.type	valpot, %object
+ 1406              		.size	valpot, 2
+ 1407              	valpot:
+ 1408 003e 0000     		.space	2
+ 1409              		.text
+ 1410              	.Letext0:
+ 1411              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 1412              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 1413              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 1414              		.file 5 "Generated_Source\\PSoC5/RTC.h"
+ 1415              		.file 6 "Generated_Source\\PSoC5/LCD.h"
+ 1416              		.file 7 "Generated_Source\\PSoC5/core_cm3.h"
+ 1417              		.file 8 "Generated_Source\\PSoC5/PWM.h"
+ 1418              		.file 9 "Generated_Source\\PSoC5/CyLib.h"
+ 1419              		.file 10 "Generated_Source\\PSoC5/led.h"
+ 1420              		.file 11 "Generated_Source\\PSoC5/ADC.h"
+ 1421              		.file 12 "Generated_Source\\PSoC5/Contaor.h"
+ 1422              		.file 13 "Generated_Source\\PSoC5/AMux_1.h"
+ 1423              		.file 14 "Generated_Source\\PSoC5/LED_Driver_1.h"
+ 1424              		.file 15 "Generated_Source\\PSoC5/ISR_Key.h"
+ 1425              		.file 16 "Generated_Source\\PSoC5/UanMS.h"
+ 1426              		.file 17 "Generated_Source\\PSoC5/logoutisr.h"
+ 1427              		.section	.debug_info,"",%progbits
+ 1428              	.Ldebug_info0:
+ 1429 0000 420E0000 		.4byte	0xe42
+ 1430 0004 0400     		.2byte	0x4
+ 1431 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 1432 000a 04       		.byte	0x4
+ 1433 000b 01       		.uleb128 0x1
+ 1434 000c 19040000 		.4byte	.LASF114
+ 1435 0010 0C       		.byte	0xc
+ 1436 0011 CD020000 		.4byte	.LASF115
+ 1437 0015 30000000 		.4byte	.LASF116
+ 1438 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 1439 001d 00000000 		.4byte	0
+ 1440 0021 00000000 		.4byte	.Ldebug_line0
+ 1441 0025 02       		.uleb128 0x2
+ 1442 0026 01       		.byte	0x1
+ 1443 0027 06       		.byte	0x6
+ 1444 0028 74000000 		.4byte	.LASF0
+ 1445 002c 02       		.uleb128 0x2
+ 1446 002d 01       		.byte	0x1
+ 1447 002e 08       		.byte	0x8
+ 1448 002f B6030000 		.4byte	.LASF1
+ 1449 0033 02       		.uleb128 0x2
+ 1450 0034 02       		.byte	0x2
+ 1451 0035 05       		.byte	0x5
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 37
+
+
+ 1452 0036 DB020000 		.4byte	.LASF2
+ 1453 003a 02       		.uleb128 0x2
+ 1454 003b 02       		.byte	0x2
+ 1455 003c 07       		.byte	0x7
+ 1456 003d 93020000 		.4byte	.LASF3
+ 1457 0041 03       		.uleb128 0x3
+ 1458 0042 51050000 		.4byte	.LASF9
+ 1459 0046 02       		.byte	0x2
+ 1460 0047 3F       		.byte	0x3f
+ 1461 0048 4C000000 		.4byte	0x4c
+ 1462 004c 02       		.uleb128 0x2
+ 1463 004d 04       		.byte	0x4
+ 1464 004e 05       		.byte	0x5
+ 1465 004f 69010000 		.4byte	.LASF4
+ 1466 0053 02       		.uleb128 0x2
+ 1467 0054 04       		.byte	0x4
+ 1468 0055 07       		.byte	0x7
+ 1469 0056 44020000 		.4byte	.LASF5
+ 1470 005a 02       		.uleb128 0x2
+ 1471 005b 08       		.byte	0x8
+ 1472 005c 05       		.byte	0x5
+ 1473 005d 1B010000 		.4byte	.LASF6
+ 1474 0061 02       		.uleb128 0x2
+ 1475 0062 08       		.byte	0x8
+ 1476 0063 07       		.byte	0x7
+ 1477 0064 BD000000 		.4byte	.LASF7
+ 1478 0068 04       		.uleb128 0x4
+ 1479 0069 04       		.byte	0x4
+ 1480 006a 05       		.byte	0x5
+ 1481 006b 696E7400 		.ascii	"int\000"
+ 1482 006f 02       		.uleb128 0x2
+ 1483 0070 04       		.byte	0x4
+ 1484 0071 07       		.byte	0x7
+ 1485 0072 2D020000 		.4byte	.LASF8
+ 1486 0076 03       		.uleb128 0x3
+ 1487 0077 AE030000 		.4byte	.LASF10
+ 1488 007b 03       		.byte	0x3
+ 1489 007c 2C       		.byte	0x2c
+ 1490 007d 41000000 		.4byte	0x41
+ 1491 0081 05       		.uleb128 0x5
+ 1492 0082 88010000 		.4byte	.LASF11
+ 1493 0086 04       		.byte	0x4
+ 1494 0087 E901     		.2byte	0x1e9
+ 1495 0089 2C000000 		.4byte	0x2c
+ 1496 008d 05       		.uleb128 0x5
+ 1497 008e 00000000 		.4byte	.LASF12
+ 1498 0092 04       		.byte	0x4
+ 1499 0093 EA01     		.2byte	0x1ea
+ 1500 0095 3A000000 		.4byte	0x3a
+ 1501 0099 05       		.uleb128 0x5
+ 1502 009a CF010000 		.4byte	.LASF13
+ 1503 009e 04       		.byte	0x4
+ 1504 009f EB01     		.2byte	0x1eb
+ 1505 00a1 53000000 		.4byte	0x53
+ 1506 00a5 02       		.uleb128 0x2
+ 1507 00a6 04       		.byte	0x4
+ 1508 00a7 04       		.byte	0x4
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 38
+
+
+ 1509 00a8 7E030000 		.4byte	.LASF14
+ 1510 00ac 02       		.uleb128 0x2
+ 1511 00ad 08       		.byte	0x8
+ 1512 00ae 04       		.byte	0x4
+ 1513 00af 9C010000 		.4byte	.LASF15
+ 1514 00b3 02       		.uleb128 0x2
+ 1515 00b4 01       		.byte	0x1
+ 1516 00b5 08       		.byte	0x8
+ 1517 00b6 07050000 		.4byte	.LASF16
+ 1518 00ba 02       		.uleb128 0x2
+ 1519 00bb 08       		.byte	0x8
+ 1520 00bc 04       		.byte	0x4
+ 1521 00bd ED040000 		.4byte	.LASF17
+ 1522 00c1 02       		.uleb128 0x2
+ 1523 00c2 04       		.byte	0x4
+ 1524 00c3 07       		.byte	0x7
+ 1525 00c4 05030000 		.4byte	.LASF18
+ 1526 00c8 06       		.uleb128 0x6
+ 1527 00c9 0C       		.byte	0xc
+ 1528 00ca 05       		.byte	0x5
+ 1529 00cb 30       		.byte	0x30
+ 1530 00cc 31010000 		.4byte	0x131
+ 1531 00d0 07       		.uleb128 0x7
+ 1532 00d1 53656300 		.ascii	"Sec\000"
+ 1533 00d5 05       		.byte	0x5
+ 1534 00d6 32       		.byte	0x32
+ 1535 00d7 81000000 		.4byte	0x81
+ 1536 00db 00       		.byte	0
+ 1537 00dc 07       		.uleb128 0x7
+ 1538 00dd 4D696E00 		.ascii	"Min\000"
+ 1539 00e1 05       		.byte	0x5
+ 1540 00e2 33       		.byte	0x33
+ 1541 00e3 81000000 		.4byte	0x81
+ 1542 00e7 01       		.byte	0x1
+ 1543 00e8 08       		.uleb128 0x8
+ 1544 00e9 E8040000 		.4byte	.LASF19
+ 1545 00ed 05       		.byte	0x5
+ 1546 00ee 34       		.byte	0x34
+ 1547 00ef 81000000 		.4byte	0x81
+ 1548 00f3 02       		.byte	0x2
+ 1549 00f4 08       		.uleb128 0x8
+ 1550 00f5 0F040000 		.4byte	.LASF20
+ 1551 00f9 05       		.byte	0x5
+ 1552 00fa 35       		.byte	0x35
+ 1553 00fb 81000000 		.4byte	0x81
+ 1554 00ff 03       		.byte	0x3
+ 1555 0100 08       		.uleb128 0x8
+ 1556 0101 78020000 		.4byte	.LASF21
+ 1557 0105 05       		.byte	0x5
+ 1558 0106 36       		.byte	0x36
+ 1559 0107 81000000 		.4byte	0x81
+ 1560 010b 04       		.byte	0x4
+ 1561 010c 08       		.uleb128 0x8
+ 1562 010d 2D060000 		.4byte	.LASF22
+ 1563 0111 05       		.byte	0x5
+ 1564 0112 37       		.byte	0x37
+ 1565 0113 8D000000 		.4byte	0x8d
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 39
+
+
+ 1566 0117 06       		.byte	0x6
+ 1567 0118 08       		.uleb128 0x8
+ 1568 0119 72010000 		.4byte	.LASF23
+ 1569 011d 05       		.byte	0x5
+ 1570 011e 38       		.byte	0x38
+ 1571 011f 81000000 		.4byte	0x81
+ 1572 0123 08       		.byte	0x8
+ 1573 0124 08       		.uleb128 0x8
+ 1574 0125 AF020000 		.4byte	.LASF24
+ 1575 0129 05       		.byte	0x5
+ 1576 012a 39       		.byte	0x39
+ 1577 012b 8D000000 		.4byte	0x8d
+ 1578 012f 0A       		.byte	0xa
+ 1579 0130 00       		.byte	0
+ 1580 0131 03       		.uleb128 0x3
+ 1581 0132 3B030000 		.4byte	.LASF25
+ 1582 0136 05       		.byte	0x5
+ 1583 0137 3A       		.byte	0x3a
+ 1584 0138 3C010000 		.4byte	0x13c
+ 1585 013c 09       		.uleb128 0x9
+ 1586 013d C8000000 		.4byte	0xc8
+ 1587 0141 0A       		.uleb128 0xa
+ 1588 0142 81000000 		.4byte	0x81
+ 1589 0146 51010000 		.4byte	0x151
+ 1590 014a 0B       		.uleb128 0xb
+ 1591 014b C1000000 		.4byte	0xc1
+ 1592 014f 03       		.byte	0x3
+ 1593 0150 00       		.byte	0
+ 1594 0151 0C       		.uleb128 0xc
+ 1595 0152 A6020000 		.4byte	.LASF26
+ 1596 0156 01       		.byte	0x1
+ 1597 0157 4B01     		.2byte	0x14b
+ 1598 0159 00000000 		.4byte	.LFB64
+ 1599 015d 0C000000 		.4byte	.LFE64-.LFB64
+ 1600 0161 01       		.uleb128 0x1
+ 1601 0162 9C       		.byte	0x9c
+ 1602 0163 0C       		.uleb128 0xc
+ 1603 0164 11060000 		.4byte	.LASF27
+ 1604 0168 01       		.byte	0x1
+ 1605 0169 5001     		.2byte	0x150
+ 1606 016b 00000000 		.4byte	.LFB65
+ 1607 016f 10000000 		.4byte	.LFE65-.LFB65
+ 1608 0173 01       		.uleb128 0x1
+ 1609 0174 9C       		.byte	0x9c
+ 1610 0175 0C       		.uleb128 0xc
+ 1611 0176 1C050000 		.4byte	.LASF28
+ 1612 017a 01       		.byte	0x1
+ 1613 017b 5601     		.2byte	0x156
+ 1614 017d 00000000 		.4byte	.LFB66
+ 1615 0181 0C000000 		.4byte	.LFE66-.LFB66
+ 1616 0185 01       		.uleb128 0x1
+ 1617 0186 9C       		.byte	0x9c
+ 1618 0187 0D       		.uleb128 0xd
+ 1619 0188 46060000 		.4byte	.LASF117
+ 1620 018c 01       		.byte	0x1
+ 1621 018d 46       		.byte	0x46
+ 1622 018e 68000000 		.4byte	0x68
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 40
+
+
+ 1623 0192 00000000 		.4byte	.LFB63
+ 1624 0196 30060000 		.4byte	.LFE63-.LFB63
+ 1625 019a 01       		.uleb128 0x1
+ 1626 019b 9C       		.byte	0x9c
+ 1627 019c C4080000 		.4byte	0x8c4
+ 1628 01a0 0E       		.uleb128 0xe
+ 1629 01a1 C1010000 		.4byte	.LASF29
+ 1630 01a5 01       		.byte	0x1
+ 1631 01a6 55       		.byte	0x55
+ 1632 01a7 68000000 		.4byte	0x68
+ 1633 01ab B1010000 		.4byte	0x1b1
+ 1634 01af 0F       		.uleb128 0xf
+ 1635 01b0 00       		.byte	0
+ 1636 01b1 10       		.uleb128 0x10
+ 1637 01b2 11060000 		.4byte	.LASF27
+ 1638 01b6 01       		.byte	0x1
+ 1639 01b7 5F       		.byte	0x5f
+ 1640 01b8 10       		.uleb128 0x10
+ 1641 01b9 A6020000 		.4byte	.LASF26
+ 1642 01bd 01       		.byte	0x1
+ 1643 01be 60       		.byte	0x60
+ 1644 01bf 10       		.uleb128 0x10
+ 1645 01c0 1C050000 		.4byte	.LASF28
+ 1646 01c4 01       		.byte	0x1
+ 1647 01c5 61       		.byte	0x61
+ 1648 01c6 11       		.uleb128 0x11
+ 1649 01c7 76000000 		.4byte	.LBB2
+ 1650 01cb C4020000 		.4byte	.LBE2-.LBB2
+ 1651 01cf 96050000 		.4byte	0x596
+ 1652 01d3 0E       		.uleb128 0xe
+ 1653 01d4 F0020000 		.4byte	.LASF30
+ 1654 01d8 01       		.byte	0x1
+ 1655 01d9 79       		.byte	0x79
+ 1656 01da 68000000 		.4byte	0x68
+ 1657 01de E4010000 		.4byte	0x1e4
+ 1658 01e2 0F       		.uleb128 0xf
+ 1659 01e3 00       		.byte	0
+ 1660 01e4 12       		.uleb128 0x12
+ 1661 01e5 7A000000 		.4byte	.LVL17
+ 1662 01e9 110D0000 		.4byte	0xd11
+ 1663 01ed 13       		.uleb128 0x13
+ 1664 01ee 92000000 		.4byte	.LVL18
+ 1665 01f2 1C0D0000 		.4byte	0xd1c
+ 1666 01f6 02020000 		.4byte	0x202
+ 1667 01fa 14       		.uleb128 0x14
+ 1668 01fb 01       		.uleb128 0x1
+ 1669 01fc 50       		.byte	0x50
+ 1670 01fd 03       		.uleb128 0x3
+ 1671 01fe 0A       		.byte	0xa
+ 1672 01ff 6009     		.2byte	0x960
+ 1673 0201 00       		.byte	0
+ 1674 0202 13       		.uleb128 0x13
+ 1675 0203 98000000 		.4byte	.LVL19
+ 1676 0207 270D0000 		.4byte	0xd27
+ 1677 020b 15020000 		.4byte	0x215
+ 1678 020f 14       		.uleb128 0x14
+ 1679 0210 01       		.uleb128 0x1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 41
+
+
+ 1680 0211 50       		.byte	0x50
+ 1681 0212 01       		.uleb128 0x1
+ 1682 0213 31       		.byte	0x31
+ 1683 0214 00       		.byte	0
+ 1684 0215 13       		.uleb128 0x13
+ 1685 0216 A0000000 		.4byte	.LVL20
+ 1686 021a 320D0000 		.4byte	0xd32
+ 1687 021e 2D020000 		.4byte	0x22d
+ 1688 0222 14       		.uleb128 0x14
+ 1689 0223 01       		.uleb128 0x1
+ 1690 0224 50       		.byte	0x50
+ 1691 0225 01       		.uleb128 0x1
+ 1692 0226 32       		.byte	0x32
+ 1693 0227 14       		.uleb128 0x14
+ 1694 0228 01       		.uleb128 0x1
+ 1695 0229 51       		.byte	0x51
+ 1696 022a 01       		.uleb128 0x1
+ 1697 022b 33       		.byte	0x33
+ 1698 022c 00       		.byte	0
+ 1699 022d 13       		.uleb128 0x13
+ 1700 022e A6000000 		.4byte	.LVL21
+ 1701 0232 3D0D0000 		.4byte	0xd3d
+ 1702 0236 44020000 		.4byte	0x244
+ 1703 023a 14       		.uleb128 0x14
+ 1704 023b 01       		.uleb128 0x1
+ 1705 023c 50       		.byte	0x50
+ 1706 023d 05       		.uleb128 0x5
+ 1707 023e 03       		.byte	0x3
+ 1708 023f 38000000 		.4byte	.LC3
+ 1709 0243 00       		.byte	0
+ 1710 0244 13       		.uleb128 0x13
+ 1711 0245 AE000000 		.4byte	.LVL22
+ 1712 0249 480D0000 		.4byte	0xd48
+ 1713 024d 59020000 		.4byte	0x259
+ 1714 0251 14       		.uleb128 0x14
+ 1715 0252 01       		.uleb128 0x1
+ 1716 0253 50       		.byte	0x50
+ 1717 0254 03       		.uleb128 0x3
+ 1718 0255 0A       		.byte	0xa
+ 1719 0256 DC05     		.2byte	0x5dc
+ 1720 0258 00       		.byte	0
+ 1721 0259 13       		.uleb128 0x13
+ 1722 025a B4000000 		.4byte	.LVL23
+ 1723 025e 270D0000 		.4byte	0xd27
+ 1724 0262 6C020000 		.4byte	0x26c
+ 1725 0266 14       		.uleb128 0x14
+ 1726 0267 01       		.uleb128 0x1
+ 1727 0268 50       		.byte	0x50
+ 1728 0269 01       		.uleb128 0x1
+ 1729 026a 31       		.byte	0x31
+ 1730 026b 00       		.byte	0
+ 1731 026c 13       		.uleb128 0x13
+ 1732 026d BC000000 		.4byte	.LVL24
+ 1733 0271 320D0000 		.4byte	0xd32
+ 1734 0275 84020000 		.4byte	0x284
+ 1735 0279 14       		.uleb128 0x14
+ 1736 027a 01       		.uleb128 0x1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 42
+
+
+ 1737 027b 50       		.byte	0x50
+ 1738 027c 01       		.uleb128 0x1
+ 1739 027d 30       		.byte	0x30
+ 1740 027e 14       		.uleb128 0x14
+ 1741 027f 01       		.uleb128 0x1
+ 1742 0280 51       		.byte	0x51
+ 1743 0281 01       		.uleb128 0x1
+ 1744 0282 32       		.byte	0x32
+ 1745 0283 00       		.byte	0
+ 1746 0284 13       		.uleb128 0x13
+ 1747 0285 C2000000 		.4byte	.LVL25
+ 1748 0289 3D0D0000 		.4byte	0xd3d
+ 1749 028d 9B020000 		.4byte	0x29b
+ 1750 0291 14       		.uleb128 0x14
+ 1751 0292 01       		.uleb128 0x1
+ 1752 0293 50       		.byte	0x50
+ 1753 0294 05       		.uleb128 0x5
+ 1754 0295 03       		.byte	0x3
+ 1755 0296 00000000 		.4byte	.LC0
+ 1756 029a 00       		.byte	0
+ 1757 029b 13       		.uleb128 0x13
+ 1758 029c CA000000 		.4byte	.LVL26
+ 1759 02a0 320D0000 		.4byte	0xd32
+ 1760 02a4 B3020000 		.4byte	0x2b3
+ 1761 02a8 14       		.uleb128 0x14
+ 1762 02a9 01       		.uleb128 0x1
+ 1763 02aa 50       		.byte	0x50
+ 1764 02ab 01       		.uleb128 0x1
+ 1765 02ac 32       		.byte	0x32
+ 1766 02ad 14       		.uleb128 0x14
+ 1767 02ae 01       		.uleb128 0x1
+ 1768 02af 51       		.byte	0x51
+ 1769 02b0 01       		.uleb128 0x1
+ 1770 02b1 33       		.byte	0x33
+ 1771 02b2 00       		.byte	0
+ 1772 02b3 13       		.uleb128 0x13
+ 1773 02b4 D0000000 		.4byte	.LVL27
+ 1774 02b8 3D0D0000 		.4byte	0xd3d
+ 1775 02bc CA020000 		.4byte	0x2ca
+ 1776 02c0 14       		.uleb128 0x14
+ 1777 02c1 01       		.uleb128 0x1
+ 1778 02c2 50       		.byte	0x50
+ 1779 02c3 05       		.uleb128 0x5
+ 1780 02c4 03       		.byte	0x3
+ 1781 02c5 48000000 		.4byte	.LC4
+ 1782 02c9 00       		.byte	0
+ 1783 02ca 13       		.uleb128 0x13
+ 1784 02cb D8000000 		.4byte	.LVL28
+ 1785 02cf 320D0000 		.4byte	0xd32
+ 1786 02d3 E2020000 		.4byte	0x2e2
+ 1787 02d7 14       		.uleb128 0x14
+ 1788 02d8 01       		.uleb128 0x1
+ 1789 02d9 50       		.byte	0x50
+ 1790 02da 01       		.uleb128 0x1
+ 1791 02db 33       		.byte	0x33
+ 1792 02dc 14       		.uleb128 0x14
+ 1793 02dd 01       		.uleb128 0x1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 43
+
+
+ 1794 02de 51       		.byte	0x51
+ 1795 02df 01       		.uleb128 0x1
+ 1796 02e0 33       		.byte	0x33
+ 1797 02e1 00       		.byte	0
+ 1798 02e2 13       		.uleb128 0x13
+ 1799 02e3 DE000000 		.4byte	.LVL29
+ 1800 02e7 3D0D0000 		.4byte	0xd3d
+ 1801 02eb F9020000 		.4byte	0x2f9
+ 1802 02ef 14       		.uleb128 0x14
+ 1803 02f0 01       		.uleb128 0x1
+ 1804 02f1 50       		.byte	0x50
+ 1805 02f2 05       		.uleb128 0x5
+ 1806 02f3 03       		.byte	0x3
+ 1807 02f4 28000000 		.4byte	.LC2
+ 1808 02f8 00       		.byte	0
+ 1809 02f9 13       		.uleb128 0x13
+ 1810 02fa 00010000 		.4byte	.LVL30
+ 1811 02fe 1C0D0000 		.4byte	0xd1c
+ 1812 0302 0E030000 		.4byte	0x30e
+ 1813 0306 14       		.uleb128 0x14
+ 1814 0307 01       		.uleb128 0x1
+ 1815 0308 50       		.byte	0x50
+ 1816 0309 03       		.uleb128 0x3
+ 1817 030a 0A       		.byte	0xa
+ 1818 030b 9B01     		.2byte	0x19b
+ 1819 030d 00       		.byte	0
+ 1820 030e 13       		.uleb128 0x13
+ 1821 030f 06010000 		.4byte	.LVL31
+ 1822 0313 270D0000 		.4byte	0xd27
+ 1823 0317 21030000 		.4byte	0x321
+ 1824 031b 14       		.uleb128 0x14
+ 1825 031c 01       		.uleb128 0x1
+ 1826 031d 50       		.byte	0x50
+ 1827 031e 01       		.uleb128 0x1
+ 1828 031f 31       		.byte	0x31
+ 1829 0320 00       		.byte	0
+ 1830 0321 13       		.uleb128 0x13
+ 1831 0322 0E010000 		.4byte	.LVL32
+ 1832 0326 320D0000 		.4byte	0xd32
+ 1833 032a 39030000 		.4byte	0x339
+ 1834 032e 14       		.uleb128 0x14
+ 1835 032f 01       		.uleb128 0x1
+ 1836 0330 50       		.byte	0x50
+ 1837 0331 01       		.uleb128 0x1
+ 1838 0332 32       		.byte	0x32
+ 1839 0333 14       		.uleb128 0x14
+ 1840 0334 01       		.uleb128 0x1
+ 1841 0335 51       		.byte	0x51
+ 1842 0336 01       		.uleb128 0x1
+ 1843 0337 33       		.byte	0x33
+ 1844 0338 00       		.byte	0
+ 1845 0339 13       		.uleb128 0x13
+ 1846 033a 14010000 		.4byte	.LVL33
+ 1847 033e 3D0D0000 		.4byte	0xd3d
+ 1848 0342 50030000 		.4byte	0x350
+ 1849 0346 14       		.uleb128 0x14
+ 1850 0347 01       		.uleb128 0x1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 44
+
+
+ 1851 0348 50       		.byte	0x50
+ 1852 0349 05       		.uleb128 0x5
+ 1853 034a 03       		.byte	0x3
+ 1854 034b 5C000000 		.4byte	.LC5
+ 1855 034f 00       		.byte	0
+ 1856 0350 13       		.uleb128 0x13
+ 1857 0351 1C010000 		.4byte	.LVL34
+ 1858 0355 480D0000 		.4byte	0xd48
+ 1859 0359 65030000 		.4byte	0x365
+ 1860 035d 14       		.uleb128 0x14
+ 1861 035e 01       		.uleb128 0x1
+ 1862 035f 50       		.byte	0x50
+ 1863 0360 03       		.uleb128 0x3
+ 1864 0361 0A       		.byte	0xa
+ 1865 0362 DC05     		.2byte	0x5dc
+ 1866 0364 00       		.byte	0
+ 1867 0365 13       		.uleb128 0x13
+ 1868 0366 22010000 		.4byte	.LVL35
+ 1869 036a 270D0000 		.4byte	0xd27
+ 1870 036e 78030000 		.4byte	0x378
+ 1871 0372 14       		.uleb128 0x14
+ 1872 0373 01       		.uleb128 0x1
+ 1873 0374 50       		.byte	0x50
+ 1874 0375 01       		.uleb128 0x1
+ 1875 0376 31       		.byte	0x31
+ 1876 0377 00       		.byte	0
+ 1877 0378 13       		.uleb128 0x13
+ 1878 0379 2A010000 		.4byte	.LVL36
+ 1879 037d 320D0000 		.4byte	0xd32
+ 1880 0381 90030000 		.4byte	0x390
+ 1881 0385 14       		.uleb128 0x14
+ 1882 0386 01       		.uleb128 0x1
+ 1883 0387 50       		.byte	0x50
+ 1884 0388 01       		.uleb128 0x1
+ 1885 0389 30       		.byte	0x30
+ 1886 038a 14       		.uleb128 0x14
+ 1887 038b 01       		.uleb128 0x1
+ 1888 038c 51       		.byte	0x51
+ 1889 038d 01       		.uleb128 0x1
+ 1890 038e 33       		.byte	0x33
+ 1891 038f 00       		.byte	0
+ 1892 0390 13       		.uleb128 0x13
+ 1893 0391 30010000 		.4byte	.LVL37
+ 1894 0395 3D0D0000 		.4byte	0xd3d
+ 1895 0399 A7030000 		.4byte	0x3a7
+ 1896 039d 14       		.uleb128 0x14
+ 1897 039e 01       		.uleb128 0x1
+ 1898 039f 50       		.byte	0x50
+ 1899 03a0 05       		.uleb128 0x5
+ 1900 03a1 03       		.byte	0x3
+ 1901 03a2 00000000 		.4byte	.LC0
+ 1902 03a6 00       		.byte	0
+ 1903 03a7 13       		.uleb128 0x13
+ 1904 03a8 38010000 		.4byte	.LVL38
+ 1905 03ac 320D0000 		.4byte	0xd32
+ 1906 03b0 BF030000 		.4byte	0x3bf
+ 1907 03b4 14       		.uleb128 0x14
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 45
+
+
+ 1908 03b5 01       		.uleb128 0x1
+ 1909 03b6 50       		.byte	0x50
+ 1910 03b7 01       		.uleb128 0x1
+ 1911 03b8 32       		.byte	0x32
+ 1912 03b9 14       		.uleb128 0x14
+ 1913 03ba 01       		.uleb128 0x1
+ 1914 03bb 51       		.byte	0x51
+ 1915 03bc 01       		.uleb128 0x1
+ 1916 03bd 33       		.byte	0x33
+ 1917 03be 00       		.byte	0
+ 1918 03bf 13       		.uleb128 0x13
+ 1919 03c0 3E010000 		.4byte	.LVL39
+ 1920 03c4 3D0D0000 		.4byte	0xd3d
+ 1921 03c8 D6030000 		.4byte	0x3d6
+ 1922 03cc 14       		.uleb128 0x14
+ 1923 03cd 01       		.uleb128 0x1
+ 1924 03ce 50       		.byte	0x50
+ 1925 03cf 05       		.uleb128 0x5
+ 1926 03d0 03       		.byte	0x3
+ 1927 03d1 6C000000 		.4byte	.LC6
+ 1928 03d5 00       		.byte	0
+ 1929 03d6 13       		.uleb128 0x13
+ 1930 03d7 46010000 		.4byte	.LVL40
+ 1931 03db 320D0000 		.4byte	0xd32
+ 1932 03df EE030000 		.4byte	0x3ee
+ 1933 03e3 14       		.uleb128 0x14
+ 1934 03e4 01       		.uleb128 0x1
+ 1935 03e5 50       		.byte	0x50
+ 1936 03e6 01       		.uleb128 0x1
+ 1937 03e7 33       		.byte	0x33
+ 1938 03e8 14       		.uleb128 0x14
+ 1939 03e9 01       		.uleb128 0x1
+ 1940 03ea 51       		.byte	0x51
+ 1941 03eb 01       		.uleb128 0x1
+ 1942 03ec 33       		.byte	0x33
+ 1943 03ed 00       		.byte	0
+ 1944 03ee 13       		.uleb128 0x13
+ 1945 03ef 4C010000 		.4byte	.LVL41
+ 1946 03f3 3D0D0000 		.4byte	0xd3d
+ 1947 03f7 05040000 		.4byte	0x405
+ 1948 03fb 14       		.uleb128 0x14
+ 1949 03fc 01       		.uleb128 0x1
+ 1950 03fd 50       		.byte	0x50
+ 1951 03fe 05       		.uleb128 0x5
+ 1952 03ff 03       		.byte	0x3
+ 1953 0400 28000000 		.4byte	.LC2
+ 1954 0404 00       		.byte	0
+ 1955 0405 13       		.uleb128 0x13
+ 1956 0406 66010000 		.4byte	.LVL42
+ 1957 040a 270D0000 		.4byte	0xd27
+ 1958 040e 18040000 		.4byte	0x418
+ 1959 0412 14       		.uleb128 0x14
+ 1960 0413 01       		.uleb128 0x1
+ 1961 0414 50       		.byte	0x50
+ 1962 0415 01       		.uleb128 0x1
+ 1963 0416 31       		.byte	0x31
+ 1964 0417 00       		.byte	0
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 46
+
+
+ 1965 0418 13       		.uleb128 0x13
+ 1966 0419 6E010000 		.4byte	.LVL43
+ 1967 041d 320D0000 		.4byte	0xd32
+ 1968 0421 30040000 		.4byte	0x430
+ 1969 0425 14       		.uleb128 0x14
+ 1970 0426 01       		.uleb128 0x1
+ 1971 0427 50       		.byte	0x50
+ 1972 0428 01       		.uleb128 0x1
+ 1973 0429 30       		.byte	0x30
+ 1974 042a 14       		.uleb128 0x14
+ 1975 042b 01       		.uleb128 0x1
+ 1976 042c 51       		.byte	0x51
+ 1977 042d 01       		.uleb128 0x1
+ 1978 042e 30       		.byte	0x30
+ 1979 042f 00       		.byte	0
+ 1980 0430 13       		.uleb128 0x13
+ 1981 0431 74010000 		.4byte	.LVL44
+ 1982 0435 3D0D0000 		.4byte	0xd3d
+ 1983 0439 47040000 		.4byte	0x447
+ 1984 043d 14       		.uleb128 0x14
+ 1985 043e 01       		.uleb128 0x1
+ 1986 043f 50       		.byte	0x50
+ 1987 0440 05       		.uleb128 0x5
+ 1988 0441 03       		.byte	0x3
+ 1989 0442 78000000 		.4byte	.LC7
+ 1990 0446 00       		.byte	0
+ 1991 0447 13       		.uleb128 0x13
+ 1992 0448 7C010000 		.4byte	.LVL45
+ 1993 044c 320D0000 		.4byte	0xd32
+ 1994 0450 5F040000 		.4byte	0x45f
+ 1995 0454 14       		.uleb128 0x14
+ 1996 0455 01       		.uleb128 0x1
+ 1997 0456 50       		.byte	0x50
+ 1998 0457 01       		.uleb128 0x1
+ 1999 0458 31       		.byte	0x31
+ 2000 0459 14       		.uleb128 0x14
+ 2001 045a 01       		.uleb128 0x1
+ 2002 045b 51       		.byte	0x51
+ 2003 045c 01       		.uleb128 0x1
+ 2004 045d 30       		.byte	0x30
+ 2005 045e 00       		.byte	0
+ 2006 045f 13       		.uleb128 0x13
+ 2007 0460 82010000 		.4byte	.LVL46
+ 2008 0464 3D0D0000 		.4byte	0xd3d
+ 2009 0468 76040000 		.4byte	0x476
+ 2010 046c 14       		.uleb128 0x14
+ 2011 046d 01       		.uleb128 0x1
+ 2012 046e 50       		.byte	0x50
+ 2013 046f 05       		.uleb128 0x5
+ 2014 0470 03       		.byte	0x3
+ 2015 0471 90000000 		.4byte	.LC8
+ 2016 0475 00       		.byte	0
+ 2017 0476 13       		.uleb128 0x13
+ 2018 0477 8A010000 		.4byte	.LVL47
+ 2019 047b 320D0000 		.4byte	0xd32
+ 2020 047f 8E040000 		.4byte	0x48e
+ 2021 0483 14       		.uleb128 0x14
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 47
+
+
+ 2022 0484 01       		.uleb128 0x1
+ 2023 0485 50       		.byte	0x50
+ 2024 0486 01       		.uleb128 0x1
+ 2025 0487 32       		.byte	0x32
+ 2026 0488 14       		.uleb128 0x14
+ 2027 0489 01       		.uleb128 0x1
+ 2028 048a 51       		.byte	0x51
+ 2029 048b 01       		.uleb128 0x1
+ 2030 048c 30       		.byte	0x30
+ 2031 048d 00       		.byte	0
+ 2032 048e 13       		.uleb128 0x13
+ 2033 048f 90010000 		.4byte	.LVL48
+ 2034 0493 3D0D0000 		.4byte	0xd3d
+ 2035 0497 A5040000 		.4byte	0x4a5
+ 2036 049b 14       		.uleb128 0x14
+ 2037 049c 01       		.uleb128 0x1
+ 2038 049d 50       		.byte	0x50
+ 2039 049e 05       		.uleb128 0x5
+ 2040 049f 03       		.byte	0x3
+ 2041 04a0 98000000 		.4byte	.LC9
+ 2042 04a4 00       		.byte	0
+ 2043 04a5 13       		.uleb128 0x13
+ 2044 04a6 98010000 		.4byte	.LVL49
+ 2045 04aa 320D0000 		.4byte	0xd32
+ 2046 04ae BD040000 		.4byte	0x4bd
+ 2047 04b2 14       		.uleb128 0x14
+ 2048 04b3 01       		.uleb128 0x1
+ 2049 04b4 50       		.byte	0x50
+ 2050 04b5 01       		.uleb128 0x1
+ 2051 04b6 33       		.byte	0x33
+ 2052 04b7 14       		.uleb128 0x14
+ 2053 04b8 01       		.uleb128 0x1
+ 2054 04b9 51       		.byte	0x51
+ 2055 04ba 01       		.uleb128 0x1
+ 2056 04bb 30       		.byte	0x30
+ 2057 04bc 00       		.byte	0
+ 2058 04bd 13       		.uleb128 0x13
+ 2059 04be 9E010000 		.4byte	.LVL50
+ 2060 04c2 3D0D0000 		.4byte	0xd3d
+ 2061 04c6 D4040000 		.4byte	0x4d4
+ 2062 04ca 14       		.uleb128 0x14
+ 2063 04cb 01       		.uleb128 0x1
+ 2064 04cc 50       		.byte	0x50
+ 2065 04cd 05       		.uleb128 0x5
+ 2066 04ce 03       		.byte	0x3
+ 2067 04cf A0000000 		.4byte	.LC10
+ 2068 04d3 00       		.byte	0
+ 2069 04d4 13       		.uleb128 0x13
+ 2070 04d5 A6010000 		.4byte	.LVL51
+ 2071 04d9 480D0000 		.4byte	0xd48
+ 2072 04dd E9040000 		.4byte	0x4e9
+ 2073 04e1 14       		.uleb128 0x14
+ 2074 04e2 01       		.uleb128 0x1
+ 2075 04e3 50       		.byte	0x50
+ 2076 04e4 03       		.uleb128 0x3
+ 2077 04e5 0A       		.byte	0xa
+ 2078 04e6 D007     		.2byte	0x7d0
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 48
+
+
+ 2079 04e8 00       		.byte	0
+ 2080 04e9 13       		.uleb128 0x13
+ 2081 04ea DE010000 		.4byte	.LVL52
+ 2082 04ee 320D0000 		.4byte	0xd32
+ 2083 04f2 01050000 		.4byte	0x501
+ 2084 04f6 14       		.uleb128 0x14
+ 2085 04f7 01       		.uleb128 0x1
+ 2086 04f8 50       		.byte	0x50
+ 2087 04f9 01       		.uleb128 0x1
+ 2088 04fa 31       		.byte	0x31
+ 2089 04fb 14       		.uleb128 0x14
+ 2090 04fc 01       		.uleb128 0x1
+ 2091 04fd 51       		.byte	0x51
+ 2092 04fe 01       		.uleb128 0x1
+ 2093 04ff 36       		.byte	0x36
+ 2094 0500 00       		.byte	0
+ 2095 0501 12       		.uleb128 0x12
+ 2096 0502 E4010000 		.4byte	.LVL53
+ 2097 0506 530D0000 		.4byte	0xd53
+ 2098 050a 13       		.uleb128 0x13
+ 2099 050b EA010000 		.4byte	.LVL54
+ 2100 050f 5E0D0000 		.4byte	0xd5e
+ 2101 0513 1D050000 		.4byte	0x51d
+ 2102 0517 14       		.uleb128 0x14
+ 2103 0518 01       		.uleb128 0x1
+ 2104 0519 50       		.byte	0x50
+ 2105 051a 01       		.uleb128 0x1
+ 2106 051b 30       		.byte	0x30
+ 2107 051c 00       		.byte	0
+ 2108 051d 12       		.uleb128 0x12
+ 2109 051e 04020000 		.4byte	.LVL55
+ 2110 0522 690D0000 		.4byte	0xd69
+ 2111 0526 12       		.uleb128 0x12
+ 2112 0527 0E020000 		.4byte	.LVL56
+ 2113 052b 740D0000 		.4byte	0xd74
+ 2114 052f 13       		.uleb128 0x13
+ 2115 0530 3E020000 		.4byte	.LVL57
+ 2116 0534 320D0000 		.4byte	0xd32
+ 2117 0538 47050000 		.4byte	0x547
+ 2118 053c 14       		.uleb128 0x14
+ 2119 053d 01       		.uleb128 0x1
+ 2120 053e 50       		.byte	0x50
+ 2121 053f 01       		.uleb128 0x1
+ 2122 0540 32       		.byte	0x32
+ 2123 0541 14       		.uleb128 0x14
+ 2124 0542 01       		.uleb128 0x1
+ 2125 0543 51       		.byte	0x51
+ 2126 0544 01       		.uleb128 0x1
+ 2127 0545 36       		.byte	0x36
+ 2128 0546 00       		.byte	0
+ 2129 0547 12       		.uleb128 0x12
+ 2130 0548 44020000 		.4byte	.LVL58
+ 2131 054c 530D0000 		.4byte	0xd53
+ 2132 0550 13       		.uleb128 0x13
+ 2133 0551 4A020000 		.4byte	.LVL59
+ 2134 0555 5E0D0000 		.4byte	0xd5e
+ 2135 0559 64050000 		.4byte	0x564
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 49
+
+
+ 2136 055d 14       		.uleb128 0x14
+ 2137 055e 01       		.uleb128 0x1
+ 2138 055f 50       		.byte	0x50
+ 2139 0560 02       		.uleb128 0x2
+ 2140 0561 08       		.byte	0x8
+ 2141 0562 25       		.byte	0x25
+ 2142 0563 00       		.byte	0
+ 2143 0564 13       		.uleb128 0x13
+ 2144 0565 8E020000 		.4byte	.LVL60
+ 2145 0569 320D0000 		.4byte	0xd32
+ 2146 056d 7C050000 		.4byte	0x57c
+ 2147 0571 14       		.uleb128 0x14
+ 2148 0572 01       		.uleb128 0x1
+ 2149 0573 50       		.byte	0x50
+ 2150 0574 01       		.uleb128 0x1
+ 2151 0575 33       		.byte	0x33
+ 2152 0576 14       		.uleb128 0x14
+ 2153 0577 01       		.uleb128 0x1
+ 2154 0578 51       		.byte	0x51
+ 2155 0579 01       		.uleb128 0x1
+ 2156 057a 36       		.byte	0x36
+ 2157 057b 00       		.byte	0
+ 2158 057c 12       		.uleb128 0x12
+ 2159 057d 94020000 		.4byte	.LVL61
+ 2160 0581 530D0000 		.4byte	0xd53
+ 2161 0585 15       		.uleb128 0x15
+ 2162 0586 9A020000 		.4byte	.LVL62
+ 2163 058a 5E0D0000 		.4byte	0xd5e
+ 2164 058e 14       		.uleb128 0x14
+ 2165 058f 01       		.uleb128 0x1
+ 2166 0590 50       		.byte	0x50
+ 2167 0591 02       		.uleb128 0x2
+ 2168 0592 08       		.byte	0x8
+ 2169 0593 6D       		.byte	0x6d
+ 2170 0594 00       		.byte	0
+ 2171 0595 00       		.byte	0
+ 2172 0596 12       		.uleb128 0x12
+ 2173 0597 08000000 		.4byte	.LVL0
+ 2174 059b 7F0D0000 		.4byte	0xd7f
+ 2175 059f 12       		.uleb128 0x12
+ 2176 05a0 0C000000 		.4byte	.LVL1
+ 2177 05a4 8A0D0000 		.4byte	0xd8a
+ 2178 05a8 12       		.uleb128 0x12
+ 2179 05a9 10000000 		.4byte	.LVL2
+ 2180 05ad 950D0000 		.4byte	0xd95
+ 2181 05b1 12       		.uleb128 0x12
+ 2182 05b2 14000000 		.4byte	.LVL3
+ 2183 05b6 A00D0000 		.4byte	0xda0
+ 2184 05ba 12       		.uleb128 0x12
+ 2185 05bb 18000000 		.4byte	.LVL4
+ 2186 05bf AB0D0000 		.4byte	0xdab
+ 2187 05c3 12       		.uleb128 0x12
+ 2188 05c4 1C000000 		.4byte	.LVL5
+ 2189 05c8 B60D0000 		.4byte	0xdb6
+ 2190 05cc 12       		.uleb128 0x12
+ 2191 05cd 20000000 		.4byte	.LVL6
+ 2192 05d1 C10D0000 		.4byte	0xdc1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 50
+
+
+ 2193 05d5 12       		.uleb128 0x12
+ 2194 05d6 26000000 		.4byte	.LVL7
+ 2195 05da CC0D0000 		.4byte	0xdcc
+ 2196 05de 13       		.uleb128 0x13
+ 2197 05df 2E000000 		.4byte	.LVL8
+ 2198 05e3 320D0000 		.4byte	0xd32
+ 2199 05e7 F6050000 		.4byte	0x5f6
+ 2200 05eb 14       		.uleb128 0x14
+ 2201 05ec 01       		.uleb128 0x1
+ 2202 05ed 50       		.byte	0x50
+ 2203 05ee 01       		.uleb128 0x1
+ 2204 05ef 30       		.byte	0x30
+ 2205 05f0 14       		.uleb128 0x14
+ 2206 05f1 01       		.uleb128 0x1
+ 2207 05f2 51       		.byte	0x51
+ 2208 05f3 01       		.uleb128 0x1
+ 2209 05f4 33       		.byte	0x33
+ 2210 05f5 00       		.byte	0
+ 2211 05f6 13       		.uleb128 0x13
+ 2212 05f7 34000000 		.4byte	.LVL9
+ 2213 05fb 3D0D0000 		.4byte	0xd3d
+ 2214 05ff 0D060000 		.4byte	0x60d
+ 2215 0603 14       		.uleb128 0x14
+ 2216 0604 01       		.uleb128 0x1
+ 2217 0605 50       		.byte	0x50
+ 2218 0606 05       		.uleb128 0x5
+ 2219 0607 03       		.byte	0x3
+ 2220 0608 00000000 		.4byte	.LC0
+ 2221 060c 00       		.byte	0
+ 2222 060d 13       		.uleb128 0x13
+ 2223 060e 3C000000 		.4byte	.LVL10
+ 2224 0612 320D0000 		.4byte	0xd32
+ 2225 0616 25060000 		.4byte	0x625
+ 2226 061a 14       		.uleb128 0x14
+ 2227 061b 01       		.uleb128 0x1
+ 2228 061c 50       		.byte	0x50
+ 2229 061d 01       		.uleb128 0x1
+ 2230 061e 32       		.byte	0x32
+ 2231 061f 14       		.uleb128 0x14
+ 2232 0620 01       		.uleb128 0x1
+ 2233 0621 51       		.byte	0x51
+ 2234 0622 01       		.uleb128 0x1
+ 2235 0623 33       		.byte	0x33
+ 2236 0624 00       		.byte	0
+ 2237 0625 13       		.uleb128 0x13
+ 2238 0626 42000000 		.4byte	.LVL11
+ 2239 062a 3D0D0000 		.4byte	0xd3d
+ 2240 062e 3C060000 		.4byte	0x63c
+ 2241 0632 14       		.uleb128 0x14
+ 2242 0633 01       		.uleb128 0x1
+ 2243 0634 50       		.byte	0x50
+ 2244 0635 05       		.uleb128 0x5
+ 2245 0636 03       		.byte	0x3
+ 2246 0637 14000000 		.4byte	.LC1
+ 2247 063b 00       		.byte	0
+ 2248 063c 13       		.uleb128 0x13
+ 2249 063d 4A000000 		.4byte	.LVL12
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 51
+
+
+ 2250 0641 320D0000 		.4byte	0xd32
+ 2251 0645 54060000 		.4byte	0x654
+ 2252 0649 14       		.uleb128 0x14
+ 2253 064a 01       		.uleb128 0x1
+ 2254 064b 50       		.byte	0x50
+ 2255 064c 01       		.uleb128 0x1
+ 2256 064d 33       		.byte	0x33
+ 2257 064e 14       		.uleb128 0x14
+ 2258 064f 01       		.uleb128 0x1
+ 2259 0650 51       		.byte	0x51
+ 2260 0651 01       		.uleb128 0x1
+ 2261 0652 33       		.byte	0x33
+ 2262 0653 00       		.byte	0
+ 2263 0654 13       		.uleb128 0x13
+ 2264 0655 50000000 		.4byte	.LVL13
+ 2265 0659 3D0D0000 		.4byte	0xd3d
+ 2266 065d 6B060000 		.4byte	0x66b
+ 2267 0661 14       		.uleb128 0x14
+ 2268 0662 01       		.uleb128 0x1
+ 2269 0663 50       		.byte	0x50
+ 2270 0664 05       		.uleb128 0x5
+ 2271 0665 03       		.byte	0x3
+ 2272 0666 28000000 		.4byte	.LC2
+ 2273 066a 00       		.byte	0
+ 2274 066b 13       		.uleb128 0x13
+ 2275 066c 56000000 		.4byte	.LVL14
+ 2276 0670 D70D0000 		.4byte	0xdd7
+ 2277 0674 82060000 		.4byte	0x682
+ 2278 0678 14       		.uleb128 0x14
+ 2279 0679 01       		.uleb128 0x1
+ 2280 067a 50       		.byte	0x50
+ 2281 067b 05       		.uleb128 0x5
+ 2282 067c 03       		.byte	0x3
+ 2283 067d 00000000 		.4byte	keyboard
+ 2284 0681 00       		.byte	0
+ 2285 0682 13       		.uleb128 0x13
+ 2286 0683 5C000000 		.4byte	.LVL15
+ 2287 0687 E20D0000 		.4byte	0xde2
+ 2288 068b 99060000 		.4byte	0x699
+ 2289 068f 14       		.uleb128 0x14
+ 2290 0690 01       		.uleb128 0x1
+ 2291 0691 50       		.byte	0x50
+ 2292 0692 05       		.uleb128 0x5
+ 2293 0693 03       		.byte	0x3
+ 2294 0694 00000000 		.4byte	counter_ms
+ 2295 0698 00       		.byte	0
+ 2296 0699 13       		.uleb128 0x13
+ 2297 069a 62000000 		.4byte	.LVL16
+ 2298 069e ED0D0000 		.4byte	0xded
+ 2299 06a2 B0060000 		.4byte	0x6b0
+ 2300 06a6 14       		.uleb128 0x14
+ 2301 06a7 01       		.uleb128 0x1
+ 2302 06a8 50       		.byte	0x50
+ 2303 06a9 05       		.uleb128 0x5
+ 2304 06aa 03       		.byte	0x3
+ 2305 06ab 00000000 		.4byte	exiit
+ 2306 06af 00       		.byte	0
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 52
+
+
+ 2307 06b0 13       		.uleb128 0x13
+ 2308 06b1 62030000 		.4byte	.LVL63
+ 2309 06b5 270D0000 		.4byte	0xd27
+ 2310 06b9 C3060000 		.4byte	0x6c3
+ 2311 06bd 14       		.uleb128 0x14
+ 2312 06be 01       		.uleb128 0x1
+ 2313 06bf 50       		.byte	0x50
+ 2314 06c0 01       		.uleb128 0x1
+ 2315 06c1 31       		.byte	0x31
+ 2316 06c2 00       		.byte	0
+ 2317 06c3 13       		.uleb128 0x13
+ 2318 06c4 6A030000 		.4byte	.LVL64
+ 2319 06c8 320D0000 		.4byte	0xd32
+ 2320 06cc DB060000 		.4byte	0x6db
+ 2321 06d0 14       		.uleb128 0x14
+ 2322 06d1 01       		.uleb128 0x1
+ 2323 06d2 50       		.byte	0x50
+ 2324 06d3 01       		.uleb128 0x1
+ 2325 06d4 31       		.byte	0x31
+ 2326 06d5 14       		.uleb128 0x14
+ 2327 06d6 01       		.uleb128 0x1
+ 2328 06d7 51       		.byte	0x51
+ 2329 06d8 01       		.uleb128 0x1
+ 2330 06d9 30       		.byte	0x30
+ 2331 06da 00       		.byte	0
+ 2332 06db 13       		.uleb128 0x13
+ 2333 06dc 70030000 		.4byte	.LVL65
+ 2334 06e0 3D0D0000 		.4byte	0xd3d
+ 2335 06e4 F2060000 		.4byte	0x6f2
+ 2336 06e8 14       		.uleb128 0x14
+ 2337 06e9 01       		.uleb128 0x1
+ 2338 06ea 50       		.byte	0x50
+ 2339 06eb 05       		.uleb128 0x5
+ 2340 06ec 03       		.byte	0x3
+ 2341 06ed A8000000 		.4byte	.LC11
+ 2342 06f1 00       		.byte	0
+ 2343 06f2 12       		.uleb128 0x12
+ 2344 06f3 A0030000 		.4byte	.LVL66
+ 2345 06f7 690D0000 		.4byte	0xd69
+ 2346 06fb 12       		.uleb128 0x12
+ 2347 06fc AA030000 		.4byte	.LVL67
+ 2348 0700 740D0000 		.4byte	0xd74
+ 2349 0704 13       		.uleb128 0x13
+ 2350 0705 E0030000 		.4byte	.LVL68
+ 2351 0709 F80D0000 		.4byte	0xdf8
+ 2352 070d 17070000 		.4byte	0x717
+ 2353 0711 14       		.uleb128 0x14
+ 2354 0712 01       		.uleb128 0x1
+ 2355 0713 51       		.byte	0x51
+ 2356 0714 01       		.uleb128 0x1
+ 2357 0715 30       		.byte	0x30
+ 2358 0716 00       		.byte	0
+ 2359 0717 13       		.uleb128 0x13
+ 2360 0718 F8030000 		.4byte	.LVL69
+ 2361 071c F80D0000 		.4byte	0xdf8
+ 2362 0720 2A070000 		.4byte	0x72a
+ 2363 0724 14       		.uleb128 0x14
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 53
+
+
+ 2364 0725 01       		.uleb128 0x1
+ 2365 0726 51       		.byte	0x51
+ 2366 0727 01       		.uleb128 0x1
+ 2367 0728 31       		.byte	0x31
+ 2368 0729 00       		.byte	0
+ 2369 072a 13       		.uleb128 0x13
+ 2370 072b 0A040000 		.4byte	.LVL70
+ 2371 072f F80D0000 		.4byte	0xdf8
+ 2372 0733 3D070000 		.4byte	0x73d
+ 2373 0737 14       		.uleb128 0x14
+ 2374 0738 01       		.uleb128 0x1
+ 2375 0739 51       		.byte	0x51
+ 2376 073a 01       		.uleb128 0x1
+ 2377 073b 32       		.byte	0x32
+ 2378 073c 00       		.byte	0
+ 2379 073d 13       		.uleb128 0x13
+ 2380 073e 22040000 		.4byte	.LVL71
+ 2381 0742 F80D0000 		.4byte	0xdf8
+ 2382 0746 50070000 		.4byte	0x750
+ 2383 074a 14       		.uleb128 0x14
+ 2384 074b 01       		.uleb128 0x1
+ 2385 074c 51       		.byte	0x51
+ 2386 074d 01       		.uleb128 0x1
+ 2387 074e 33       		.byte	0x33
+ 2388 074f 00       		.byte	0
+ 2389 0750 13       		.uleb128 0x13
+ 2390 0751 4C040000 		.4byte	.LVL72
+ 2391 0755 320D0000 		.4byte	0xd32
+ 2392 0759 68070000 		.4byte	0x768
+ 2393 075d 14       		.uleb128 0x14
+ 2394 075e 01       		.uleb128 0x1
+ 2395 075f 50       		.byte	0x50
+ 2396 0760 01       		.uleb128 0x1
+ 2397 0761 31       		.byte	0x31
+ 2398 0762 14       		.uleb128 0x14
+ 2399 0763 01       		.uleb128 0x1
+ 2400 0764 51       		.byte	0x51
+ 2401 0765 01       		.uleb128 0x1
+ 2402 0766 30       		.byte	0x30
+ 2403 0767 00       		.byte	0
+ 2404 0768 13       		.uleb128 0x13
+ 2405 0769 52040000 		.4byte	.LVL73
+ 2406 076d 3D0D0000 		.4byte	0xd3d
+ 2407 0771 7F070000 		.4byte	0x77f
+ 2408 0775 14       		.uleb128 0x14
+ 2409 0776 01       		.uleb128 0x1
+ 2410 0777 50       		.byte	0x50
+ 2411 0778 05       		.uleb128 0x5
+ 2412 0779 03       		.byte	0x3
+ 2413 077a BC000000 		.4byte	.LC12
+ 2414 077e 00       		.byte	0
+ 2415 077f 13       		.uleb128 0x13
+ 2416 0780 92040000 		.4byte	.LVL74
+ 2417 0784 030E0000 		.4byte	0xe03
+ 2418 0788 92070000 		.4byte	0x792
+ 2419 078c 14       		.uleb128 0x14
+ 2420 078d 01       		.uleb128 0x1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 54
+
+
+ 2421 078e 50       		.byte	0x50
+ 2422 078f 01       		.uleb128 0x1
+ 2423 0790 31       		.byte	0x31
+ 2424 0791 00       		.byte	0
+ 2425 0792 12       		.uleb128 0x12
+ 2426 0793 96040000 		.4byte	.LVL75
+ 2427 0797 0E0E0000 		.4byte	0xe0e
+ 2428 079b 13       		.uleb128 0x13
+ 2429 079c 9C040000 		.4byte	.LVL76
+ 2430 07a0 190E0000 		.4byte	0xe19
+ 2431 07a4 AE070000 		.4byte	0x7ae
+ 2432 07a8 14       		.uleb128 0x14
+ 2433 07a9 01       		.uleb128 0x1
+ 2434 07aa 50       		.byte	0x50
+ 2435 07ab 01       		.uleb128 0x1
+ 2436 07ac 31       		.byte	0x31
+ 2437 07ad 00       		.byte	0
+ 2438 07ae 12       		.uleb128 0x12
+ 2439 07af A4040000 		.4byte	.LVL77
+ 2440 07b3 240E0000 		.4byte	0xe24
+ 2441 07b7 12       		.uleb128 0x12
+ 2442 07b8 AC040000 		.4byte	.LVL78
+ 2443 07bc 2F0E0000 		.4byte	0xe2f
+ 2444 07c0 12       		.uleb128 0x12
+ 2445 07c1 B2040000 		.4byte	.LVL79
+ 2446 07c5 3A0E0000 		.4byte	0xe3a
+ 2447 07c9 13       		.uleb128 0x13
+ 2448 07ca C0040000 		.4byte	.LVL80
+ 2449 07ce 030E0000 		.4byte	0xe03
+ 2450 07d2 DC070000 		.4byte	0x7dc
+ 2451 07d6 14       		.uleb128 0x14
+ 2452 07d7 01       		.uleb128 0x1
+ 2453 07d8 50       		.byte	0x50
+ 2454 07d9 01       		.uleb128 0x1
+ 2455 07da 30       		.byte	0x30
+ 2456 07db 00       		.byte	0
+ 2457 07dc 12       		.uleb128 0x12
+ 2458 07dd C4040000 		.4byte	.LVL81
+ 2459 07e1 0E0E0000 		.4byte	0xe0e
+ 2460 07e5 13       		.uleb128 0x13
+ 2461 07e6 CA040000 		.4byte	.LVL82
+ 2462 07ea 190E0000 		.4byte	0xe19
+ 2463 07ee F8070000 		.4byte	0x7f8
+ 2464 07f2 14       		.uleb128 0x14
+ 2465 07f3 01       		.uleb128 0x1
+ 2466 07f4 50       		.byte	0x50
+ 2467 07f5 01       		.uleb128 0x1
+ 2468 07f6 31       		.byte	0x31
+ 2469 07f7 00       		.byte	0
+ 2470 07f8 12       		.uleb128 0x12
+ 2471 07f9 D2040000 		.4byte	.LVL83
+ 2472 07fd 240E0000 		.4byte	0xe24
+ 2473 0801 12       		.uleb128 0x12
+ 2474 0802 DA040000 		.4byte	.LVL84
+ 2475 0806 2F0E0000 		.4byte	0xe2f
+ 2476 080a 12       		.uleb128 0x12
+ 2477 080b E0040000 		.4byte	.LVL85
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 55
+
+
+ 2478 080f 3A0E0000 		.4byte	0xe3a
+ 2479 0813 13       		.uleb128 0x13
+ 2480 0814 32050000 		.4byte	.LVL89
+ 2481 0818 320D0000 		.4byte	0xd32
+ 2482 081c 2C080000 		.4byte	0x82c
+ 2483 0820 14       		.uleb128 0x14
+ 2484 0821 01       		.uleb128 0x1
+ 2485 0822 50       		.byte	0x50
+ 2486 0823 01       		.uleb128 0x1
+ 2487 0824 32       		.byte	0x32
+ 2488 0825 14       		.uleb128 0x14
+ 2489 0826 01       		.uleb128 0x1
+ 2490 0827 51       		.byte	0x51
+ 2491 0828 02       		.uleb128 0x2
+ 2492 0829 75       		.byte	0x75
+ 2493 082a 00       		.sleb128 0
+ 2494 082b 00       		.byte	0
+ 2495 082c 13       		.uleb128 0x13
+ 2496 082d 38050000 		.4byte	.LVL90
+ 2497 0831 3D0D0000 		.4byte	0xd3d
+ 2498 0835 43080000 		.4byte	0x843
+ 2499 0839 14       		.uleb128 0x14
+ 2500 083a 01       		.uleb128 0x1
+ 2501 083b 50       		.byte	0x50
+ 2502 083c 05       		.uleb128 0x5
+ 2503 083d 03       		.byte	0x3
+ 2504 083e D0000000 		.4byte	.LC13
+ 2505 0842 00       		.byte	0
+ 2506 0843 12       		.uleb128 0x12
+ 2507 0844 3E050000 		.4byte	.LVL91
+ 2508 0848 530D0000 		.4byte	0xd53
+ 2509 084c 13       		.uleb128 0x13
+ 2510 084d 44050000 		.4byte	.LVL92
+ 2511 0851 3D0D0000 		.4byte	0xd3d
+ 2512 0855 63080000 		.4byte	0x863
+ 2513 0859 14       		.uleb128 0x14
+ 2514 085a 01       		.uleb128 0x1
+ 2515 085b 50       		.byte	0x50
+ 2516 085c 05       		.uleb128 0x5
+ 2517 085d 03       		.byte	0x3
+ 2518 085e DC000000 		.4byte	.LC14
+ 2519 0862 00       		.byte	0
+ 2520 0863 13       		.uleb128 0x13
+ 2521 0864 4E050000 		.4byte	.LVL93
+ 2522 0868 320D0000 		.4byte	0xd32
+ 2523 086c 7C080000 		.4byte	0x87c
+ 2524 0870 14       		.uleb128 0x14
+ 2525 0871 01       		.uleb128 0x1
+ 2526 0872 50       		.byte	0x50
+ 2527 0873 01       		.uleb128 0x1
+ 2528 0874 33       		.byte	0x33
+ 2529 0875 14       		.uleb128 0x14
+ 2530 0876 01       		.uleb128 0x1
+ 2531 0877 51       		.byte	0x51
+ 2532 0878 02       		.uleb128 0x2
+ 2533 0879 75       		.byte	0x75
+ 2534 087a 00       		.sleb128 0
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 56
+
+
+ 2535 087b 00       		.byte	0
+ 2536 087c 13       		.uleb128 0x13
+ 2537 087d 54050000 		.4byte	.LVL94
+ 2538 0881 3D0D0000 		.4byte	0xd3d
+ 2539 0885 93080000 		.4byte	0x893
+ 2540 0889 14       		.uleb128 0x14
+ 2541 088a 01       		.uleb128 0x1
+ 2542 088b 50       		.byte	0x50
+ 2543 088c 05       		.uleb128 0x5
+ 2544 088d 03       		.byte	0x3
+ 2545 088e E0000000 		.4byte	.LC15
+ 2546 0892 00       		.byte	0
+ 2547 0893 12       		.uleb128 0x12
+ 2548 0894 5A050000 		.4byte	.LVL95
+ 2549 0898 530D0000 		.4byte	0xd53
+ 2550 089c 13       		.uleb128 0x13
+ 2551 089d 60050000 		.4byte	.LVL96
+ 2552 08a1 5E0D0000 		.4byte	0xd5e
+ 2553 08a5 B0080000 		.4byte	0x8b0
+ 2554 08a9 14       		.uleb128 0x14
+ 2555 08aa 01       		.uleb128 0x1
+ 2556 08ab 50       		.byte	0x50
+ 2557 08ac 02       		.uleb128 0x2
+ 2558 08ad 75       		.byte	0x75
+ 2559 08ae 00       		.sleb128 0
+ 2560 08af 00       		.byte	0
+ 2561 08b0 15       		.uleb128 0x15
+ 2562 08b1 66050000 		.4byte	.LVL97
+ 2563 08b5 3D0D0000 		.4byte	0xd3d
+ 2564 08b9 14       		.uleb128 0x14
+ 2565 08ba 01       		.uleb128 0x1
+ 2566 08bb 50       		.byte	0x50
+ 2567 08bc 05       		.uleb128 0x5
+ 2568 08bd 03       		.byte	0x3
+ 2569 08be E8000000 		.4byte	.LC16
+ 2570 08c2 00       		.byte	0
+ 2571 08c3 00       		.byte	0
+ 2572 08c4 16       		.uleb128 0x16
+ 2573 08c5 FA030000 		.4byte	.LASF118
+ 2574 08c9 01       		.byte	0x1
+ 2575 08ca 5C01     		.2byte	0x15c
+ 2576 08cc 81000000 		.4byte	0x81
+ 2577 08d0 00000000 		.4byte	.LFB67
+ 2578 08d4 2E000000 		.4byte	.LFE67-.LFB67
+ 2579 08d8 01       		.uleb128 0x1
+ 2580 08d9 9C       		.byte	0x9c
+ 2581 08da 1D090000 		.4byte	0x91d
+ 2582 08de 17       		.uleb128 0x17
+ 2583 08df 71060000 		.4byte	.LASF31
+ 2584 08e3 01       		.byte	0x1
+ 2585 08e4 5C01     		.2byte	0x15c
+ 2586 08e6 1D090000 		.4byte	0x91d
+ 2587 08ea 00000000 		.4byte	.LLST0
+ 2588 08ee 17       		.uleb128 0x17
+ 2589 08ef C8040000 		.4byte	.LASF32
+ 2590 08f3 01       		.byte	0x1
+ 2591 08f4 5C01     		.2byte	0x15c
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 57
+
+
+ 2592 08f6 1D090000 		.4byte	0x91d
+ 2593 08fa 29000000 		.4byte	.LLST1
+ 2594 08fe 18       		.uleb128 0x18
+ 2595 08ff DF040000 		.4byte	.LASF33
+ 2596 0903 01       		.byte	0x1
+ 2597 0904 5D01     		.2byte	0x15d
+ 2598 0906 81000000 		.4byte	0x81
+ 2599 090a 47000000 		.4byte	.LLST2
+ 2600 090e 19       		.uleb128 0x19
+ 2601 090f 6D00     		.ascii	"m\000"
+ 2602 0911 01       		.byte	0x1
+ 2603 0912 5E01     		.2byte	0x15e
+ 2604 0914 81000000 		.4byte	0x81
+ 2605 0918 71000000 		.4byte	.LLST3
+ 2606 091c 00       		.byte	0
+ 2607 091d 1A       		.uleb128 0x1a
+ 2608 091e 04       		.byte	0x4
+ 2609 091f 23090000 		.4byte	0x923
+ 2610 0923 1B       		.uleb128 0x1b
+ 2611 0924 81000000 		.4byte	0x81
+ 2612 0928 0A       		.uleb128 0xa
+ 2613 0929 23090000 		.4byte	0x923
+ 2614 092d 38090000 		.4byte	0x938
+ 2615 0931 0B       		.uleb128 0xb
+ 2616 0932 C1000000 		.4byte	0xc1
+ 2617 0936 3F       		.byte	0x3f
+ 2618 0937 00       		.byte	0
+ 2619 0938 1C       		.uleb128 0x1c
+ 2620 0939 04010000 		.4byte	.LASF34
+ 2621 093d 06       		.byte	0x6
+ 2622 093e 77       		.byte	0x77
+ 2623 093f 43090000 		.4byte	0x943
+ 2624 0943 1B       		.uleb128 0x1b
+ 2625 0944 28090000 		.4byte	0x928
+ 2626 0948 1D       		.uleb128 0x1d
+ 2627 0949 E6000000 		.4byte	.LASF35
+ 2628 094d 07       		.byte	0x7
+ 2629 094e 1207     		.2byte	0x712
+ 2630 0950 54090000 		.4byte	0x954
+ 2631 0954 09       		.uleb128 0x9
+ 2632 0955 76000000 		.4byte	0x76
+ 2633 0959 1E       		.uleb128 0x1e
+ 2634 095a 08040000 		.4byte	.LASF36
+ 2635 095e 01       		.byte	0x1
+ 2636 095f 0D       		.byte	0xd
+ 2637 0960 8D000000 		.4byte	0x8d
+ 2638 0964 05       		.uleb128 0x5
+ 2639 0965 03       		.byte	0x3
+ 2640 0966 00000000 		.4byte	valpot
+ 2641 096a 1E       		.uleb128 0x1e
+ 2642 096b 46050000 		.4byte	.LASF37
+ 2643 096f 01       		.byte	0x1
+ 2644 0970 0E       		.byte	0xe
+ 2645 0971 81000000 		.4byte	0x81
+ 2646 0975 05       		.uleb128 0x5
+ 2647 0976 03       		.byte	0x3
+ 2648 0977 00000000 		.4byte	tipounidad
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 58
+
+
+ 2649 097b 1E       		.uleb128 0x1e
+ 2650 097c 14010000 		.4byte	.LASF38
+ 2651 0980 01       		.byte	0x1
+ 2652 0981 0F       		.byte	0xf
+ 2653 0982 99000000 		.4byte	0x99
+ 2654 0986 05       		.uleb128 0x5
+ 2655 0987 03       		.byte	0x3
+ 2656 0988 00000000 		.4byte	angulo
+ 2657 098c 1E       		.uleb128 0x1e
+ 2658 098d 6E000000 		.4byte	.LASF39
+ 2659 0991 01       		.byte	0x1
+ 2660 0992 10       		.byte	0x10
+ 2661 0993 81000000 		.4byte	0x81
+ 2662 0997 05       		.uleb128 0x5
+ 2663 0998 03       		.byte	0x3
+ 2664 0999 00000000 		.4byte	tecla
+ 2665 099d 1E       		.uleb128 0x1e
+ 2666 099e D4000000 		.4byte	.LASF40
+ 2667 09a2 01       		.byte	0x1
+ 2668 09a3 11       		.byte	0x11
+ 2669 09a4 81000000 		.4byte	0x81
+ 2670 09a8 05       		.uleb128 0x5
+ 2671 09a9 03       		.byte	0x3
+ 2672 09aa 00000000 		.4byte	countpot
+ 2673 09ae 1E       		.uleb128 0x1e
+ 2674 09af 1C060000 		.4byte	.LASF41
+ 2675 09b3 01       		.byte	0x1
+ 2676 09b4 12       		.byte	0x12
+ 2677 09b5 81000000 		.4byte	0x81
+ 2678 09b9 05       		.uleb128 0x5
+ 2679 09ba 03       		.byte	0x3
+ 2680 09bb 00000000 		.4byte	potband
+ 2681 09bf 1E       		.uleb128 0x1e
+ 2682 09c0 49030000 		.4byte	.LASF42
+ 2683 09c4 01       		.byte	0x1
+ 2684 09c5 13       		.byte	0x13
+ 2685 09c6 81000000 		.4byte	0x81
+ 2686 09ca 05       		.uleb128 0x5
+ 2687 09cb 03       		.byte	0x3
+ 2688 09cc 00000000 		.4byte	tecladoband
+ 2689 09d0 1F       		.uleb128 0x1f
+ 2690 09d1 706F7300 		.ascii	"pos\000"
+ 2691 09d5 01       		.byte	0x1
+ 2692 09d6 14       		.byte	0x14
+ 2693 09d7 81000000 		.4byte	0x81
+ 2694 09db 05       		.uleb128 0x5
+ 2695 09dc 03       		.byte	0x3
+ 2696 09dd 00000000 		.4byte	pos
+ 2697 09e1 1F       		.uleb128 0x1f
+ 2698 09e2 6D733100 		.ascii	"ms1\000"
+ 2699 09e6 01       		.byte	0x1
+ 2700 09e7 15       		.byte	0x15
+ 2701 09e8 81000000 		.4byte	0x81
+ 2702 09ec 05       		.uleb128 0x5
+ 2703 09ed 03       		.byte	0x3
+ 2704 09ee 00000000 		.4byte	ms1
+ 2705 09f2 1F       		.uleb128 0x1f
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 59
+
+
+ 2706 09f3 6D733200 		.ascii	"ms2\000"
+ 2707 09f7 01       		.byte	0x1
+ 2708 09f8 16       		.byte	0x16
+ 2709 09f9 81000000 		.4byte	0x81
+ 2710 09fd 05       		.uleb128 0x5
+ 2711 09fe 03       		.byte	0x3
+ 2712 09ff 00000000 		.4byte	ms2
+ 2713 0a03 1F       		.uleb128 0x1f
+ 2714 0a04 61646400 		.ascii	"add\000"
+ 2715 0a08 01       		.byte	0x1
+ 2716 0a09 17       		.byte	0x17
+ 2717 0a0a 81000000 		.4byte	0x81
+ 2718 0a0e 05       		.uleb128 0x5
+ 2719 0a0f 03       		.byte	0x3
+ 2720 0a10 00000000 		.4byte	add
+ 2721 0a14 1E       		.uleb128 0x1e
+ 2722 0a15 24060000 		.4byte	.LASF43
+ 2723 0a19 01       		.byte	0x1
+ 2724 0a1a 18       		.byte	0x18
+ 2725 0a1b 81000000 		.4byte	0x81
+ 2726 0a1f 05       		.uleb128 0x5
+ 2727 0a20 03       		.byte	0x3
+ 2728 0a21 00000000 		.4byte	correcto
+ 2729 0a25 1E       		.uleb128 0x1e
+ 2730 0a26 29010000 		.4byte	.LASF44
+ 2731 0a2a 01       		.byte	0x1
+ 2732 0a2b 19       		.byte	0x19
+ 2733 0a2c 81000000 		.4byte	0x81
+ 2734 0a30 05       		.uleb128 0x5
+ 2735 0a31 03       		.byte	0x3
+ 2736 0a32 00000000 		.4byte	ohno
+ 2737 0a36 1E       		.uleb128 0x1e
+ 2738 0a37 2A030000 		.4byte	.LASF45
+ 2739 0a3b 01       		.byte	0x1
+ 2740 0a3c 1A       		.byte	0x1a
+ 2741 0a3d 81000000 		.4byte	0x81
+ 2742 0a41 05       		.uleb128 0x5
+ 2743 0a42 03       		.byte	0x3
+ 2744 0a43 00000000 		.4byte	ESCORRECTO
+ 2745 0a47 1E       		.uleb128 0x1e
+ 2746 0a48 D4020000 		.4byte	.LASF46
+ 2747 0a4c 01       		.byte	0x1
+ 2748 0a4d 1B       		.byte	0x1b
+ 2749 0a4e 81000000 		.4byte	0x81
+ 2750 0a52 05       		.uleb128 0x5
+ 2751 0a53 03       		.byte	0x3
+ 2752 0a54 00000000 		.4byte	salida
+ 2753 0a58 1E       		.uleb128 0x1e
+ 2754 0a59 C2050000 		.4byte	.LASF47
+ 2755 0a5d 01       		.byte	0x1
+ 2756 0a5e 1C       		.byte	0x1c
+ 2757 0a5f 99000000 		.4byte	0x99
+ 2758 0a63 05       		.uleb128 0x5
+ 2759 0a64 03       		.byte	0x3
+ 2760 0a65 00000000 		.4byte	counterOut
+ 2761 0a69 1E       		.uleb128 0x1e
+ 2762 0a6a 64000000 		.4byte	.LASF48
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 60
+
+
+ 2763 0a6e 01       		.byte	0x1
+ 2764 0a6f 1D       		.byte	0x1d
+ 2765 0a70 81000000 		.4byte	0x81
+ 2766 0a74 05       		.uleb128 0x5
+ 2767 0a75 03       		.byte	0x3
+ 2768 0a76 00000000 		.4byte	comparado
+ 2769 0a7a 1E       		.uleb128 0x1e
+ 2770 0a7b F9040000 		.4byte	.LASF49
+ 2771 0a7f 01       		.byte	0x1
+ 2772 0a80 1E       		.byte	0x1e
+ 2773 0a81 81000000 		.4byte	0x81
+ 2774 0a85 05       		.uleb128 0x5
+ 2775 0a86 03       		.byte	0x3
+ 2776 0a87 00000000 		.4byte	ciclo_acabado
+ 2777 0a8b 1E       		.uleb128 0x1e
+ 2778 0a8c E5020000 		.4byte	.LASF50
+ 2779 0a90 01       		.byte	0x1
+ 2780 0a91 1F       		.byte	0x1f
+ 2781 0a92 8D000000 		.4byte	0x8d
+ 2782 0a96 05       		.uleb128 0x5
+ 2783 0a97 03       		.byte	0x3
+ 2784 0a98 00000000 		.4byte	senal_hume
+ 2785 0a9c 1E       		.uleb128 0x1e
+ 2786 0a9d 94000000 		.4byte	.LASF51
+ 2787 0aa1 01       		.byte	0x1
+ 2788 0aa2 20       		.byte	0x20
+ 2789 0aa3 8D000000 		.4byte	0x8d
+ 2790 0aa7 05       		.uleb128 0x5
+ 2791 0aa8 03       		.byte	0x3
+ 2792 0aa9 00000000 		.4byte	senal_temp
+ 2793 0aad 1E       		.uleb128 0x1e
+ 2794 0aae 73030000 		.4byte	.LASF52
+ 2795 0ab2 01       		.byte	0x1
+ 2796 0ab3 21       		.byte	0x21
+ 2797 0ab4 99000000 		.4byte	0x99
+ 2798 0ab8 05       		.uleb128 0x5
+ 2799 0ab9 03       		.byte	0x3
+ 2800 0aba 00000000 		.4byte	milivolt_h
+ 2801 0abe 1E       		.uleb128 0x1e
+ 2802 0abf C4030000 		.4byte	.LASF53
+ 2803 0ac3 01       		.byte	0x1
+ 2804 0ac4 22       		.byte	0x22
+ 2805 0ac5 99000000 		.4byte	0x99
+ 2806 0ac9 05       		.uleb128 0x5
+ 2807 0aca 03       		.byte	0x3
+ 2808 0acb 00000000 		.4byte	milivolt_temp
+ 2809 0acf 1E       		.uleb128 0x1e
+ 2810 0ad0 C2020000 		.4byte	.LASF54
+ 2811 0ad4 01       		.byte	0x1
+ 2812 0ad5 23       		.byte	0x23
+ 2813 0ad6 81000000 		.4byte	0x81
+ 2814 0ada 05       		.uleb128 0x5
+ 2815 0adb 03       		.byte	0x3
+ 2816 0adc 00000000 		.4byte	finishpass
+ 2817 0ae0 1E       		.uleb128 0x1e
+ 2818 0ae1 69020000 		.4byte	.LASF55
+ 2819 0ae5 01       		.byte	0x1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 61
+
+
+ 2820 0ae6 24       		.byte	0x24
+ 2821 0ae7 81000000 		.4byte	0x81
+ 2822 0aeb 05       		.uleb128 0x5
+ 2823 0aec 03       		.byte	0x3
+ 2824 0aed 00000000 		.4byte	puerta_cerrada
+ 2825 0af1 1E       		.uleb128 0x1e
+ 2826 0af2 37060000 		.4byte	.LASF56
+ 2827 0af6 01       		.byte	0x1
+ 2828 0af7 25       		.byte	0x25
+ 2829 0af8 41010000 		.4byte	0x141
+ 2830 0afc 05       		.uleb128 0x5
+ 2831 0afd 03       		.byte	0x3
+ 2832 0afe 00000000 		.4byte	ClaveIngresada
+ 2833 0b02 1E       		.uleb128 0x1e
+ 2834 0b03 8E010000 		.4byte	.LASF57
+ 2835 0b07 01       		.byte	0x1
+ 2836 0b08 26       		.byte	0x26
+ 2837 0b09 41010000 		.4byte	0x141
+ 2838 0b0d 05       		.uleb128 0x5
+ 2839 0b0e 03       		.byte	0x3
+ 2840 0b0f 00000000 		.4byte	ClaveOriginal
+ 2841 0b13 1E       		.uleb128 0x1e
+ 2842 0b14 28020000 		.4byte	.LASF58
+ 2843 0b18 01       		.byte	0x1
+ 2844 0b19 28       		.byte	0x28
+ 2845 0b1a 8D000000 		.4byte	0x8d
+ 2846 0b1e 05       		.uleb128 0x5
+ 2847 0b1f 03       		.byte	0x3
+ 2848 0b20 00000000 		.4byte	temp
+ 2849 0b24 1E       		.uleb128 0x1e
+ 2850 0b25 BA050000 		.4byte	.LASF59
+ 2851 0b29 01       		.byte	0x1
+ 2852 0b2a 29       		.byte	0x29
+ 2853 0b2b 8D000000 		.4byte	0x8d
+ 2854 0b2f 05       		.uleb128 0x5
+ 2855 0b30 03       		.byte	0x3
+ 2856 0b31 00000000 		.4byte	humedad
+ 2857 0b35 1E       		.uleb128 0x1e
+ 2858 0b36 56020000 		.4byte	.LASF60
+ 2859 0b3a 01       		.byte	0x1
+ 2860 0b3b 2A       		.byte	0x2a
+ 2861 0b3c 81000000 		.4byte	0x81
+ 2862 0b40 05       		.uleb128 0x5
+ 2863 0b41 03       		.byte	0x3
+ 2864 0b42 00000000 		.4byte	ingresando_valores
+ 2865 0b46 1E       		.uleb128 0x1e
+ 2866 0b47 22050000 		.4byte	.LASF61
+ 2867 0b4b 01       		.byte	0x1
+ 2868 0b4c 2B       		.byte	0x2b
+ 2869 0b4d 81000000 		.4byte	0x81
+ 2870 0b51 05       		.uleb128 0x5
+ 2871 0b52 03       		.byte	0x3
+ 2872 0b53 00000000 		.4byte	temperatura_anadida
+ 2873 0b57 1E       		.uleb128 0x1e
+ 2874 0b58 0B020000 		.4byte	.LASF62
+ 2875 0b5c 01       		.byte	0x1
+ 2876 0b5d 2C       		.byte	0x2c
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 62
+
+
+ 2877 0b5e 81000000 		.4byte	0x81
+ 2878 0b62 05       		.uleb128 0x5
+ 2879 0b63 03       		.byte	0x3
+ 2880 0b64 00000000 		.4byte	humedad_anadida
+ 2881 0b68 1E       		.uleb128 0x1e
+ 2882 0b69 DA050000 		.4byte	.LASF63
+ 2883 0b6d 01       		.byte	0x1
+ 2884 0b6e 2D       		.byte	0x2d
+ 2885 0b6f 81000000 		.4byte	0x81
+ 2886 0b73 05       		.uleb128 0x5
+ 2887 0b74 03       		.byte	0x3
+ 2888 0b75 00000000 		.4byte	tiempo_anadido
+ 2889 0b79 1E       		.uleb128 0x1e
+ 2890 0b7a E4030000 		.4byte	.LASF64
+ 2891 0b7e 01       		.byte	0x1
+ 2892 0b7f 2E       		.byte	0x2e
+ 2893 0b80 99000000 		.4byte	0x99
+ 2894 0b84 05       		.uleb128 0x5
+ 2895 0b85 03       		.byte	0x3
+ 2896 0b86 00000000 		.4byte	temp_in
+ 2897 0b8a 1E       		.uleb128 0x1e
+ 2898 0b8b 9F000000 		.4byte	.LASF65
+ 2899 0b8f 01       		.byte	0x1
+ 2900 0b90 2F       		.byte	0x2f
+ 2901 0b91 99000000 		.4byte	0x99
+ 2902 0b95 05       		.uleb128 0x5
+ 2903 0b96 03       		.byte	0x3
+ 2904 0b97 00000000 		.4byte	humedad_in
+ 2905 0b9b 1E       		.uleb128 0x1e
+ 2906 0b9c B3000000 		.4byte	.LASF66
+ 2907 0ba0 01       		.byte	0x1
+ 2908 0ba1 30       		.byte	0x30
+ 2909 0ba2 99000000 		.4byte	0x99
+ 2910 0ba6 05       		.uleb128 0x5
+ 2911 0ba7 03       		.byte	0x3
+ 2912 0ba8 00000000 		.4byte	tiempo_in
+ 2913 0bac 1E       		.uleb128 0x1e
+ 2914 0bad FD050000 		.4byte	.LASF67
+ 2915 0bb1 01       		.byte	0x1
+ 2916 0bb2 31       		.byte	0x31
+ 2917 0bb3 81000000 		.4byte	0x81
+ 2918 0bb7 05       		.uleb128 0x5
+ 2919 0bb8 03       		.byte	0x3
+ 2920 0bb9 00000000 		.4byte	valores_confirmados
+ 2921 0bbd 1E       		.uleb128 0x1e
+ 2922 0bbe 07000000 		.4byte	.LASF68
+ 2923 0bc2 01       		.byte	0x1
+ 2924 0bc3 32       		.byte	0x32
+ 2925 0bc4 8D000000 		.4byte	0x8d
+ 2926 0bc8 05       		.uleb128 0x5
+ 2927 0bc9 03       		.byte	0x3
+ 2928 0bca 00000000 		.4byte	min_crono
+ 2929 0bce 1E       		.uleb128 0x1e
+ 2930 0bcf D6010000 		.4byte	.LASF69
+ 2931 0bd3 01       		.byte	0x1
+ 2932 0bd4 33       		.byte	0x33
+ 2933 0bd5 8D000000 		.4byte	0x8d
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 63
+
+
+ 2934 0bd9 05       		.uleb128 0x5
+ 2935 0bda 03       		.byte	0x3
+ 2936 0bdb 00000000 		.4byte	segundos_crono
+ 2937 0bdf 1E       		.uleb128 0x1e
+ 2938 0be0 D1040000 		.4byte	.LASF70
+ 2939 0be4 01       		.byte	0x1
+ 2940 0be5 34       		.byte	0x34
+ 2941 0be6 8D000000 		.4byte	0x8d
+ 2942 0bea 05       		.uleb128 0x5
+ 2943 0beb 03       		.byte	0x3
+ 2944 0bec 00000000 		.4byte	miliseg_crono
+ 2945 0bf0 1E       		.uleb128 0x1e
+ 2946 0bf1 A3010000 		.4byte	.LASF71
+ 2947 0bf5 01       		.byte	0x1
+ 2948 0bf6 35       		.byte	0x35
+ 2949 0bf7 81000000 		.4byte	0x81
+ 2950 0bfb 05       		.uleb128 0x5
+ 2951 0bfc 03       		.byte	0x3
+ 2952 0bfd 00000000 		.4byte	iniciar_conteo
+ 2953 0c01 1E       		.uleb128 0x1e
+ 2954 0c02 E5010000 		.4byte	.LASF72
+ 2955 0c06 01       		.byte	0x1
+ 2956 0c07 36       		.byte	0x36
+ 2957 0c08 81000000 		.4byte	0x81
+ 2958 0c0c 05       		.uleb128 0x5
+ 2959 0c0d 03       		.byte	0x3
+ 2960 0c0e 00000000 		.4byte	mostrar_EnCilolcd
+ 2961 0c12 1E       		.uleb128 0x1e
+ 2962 0c13 9E050000 		.4byte	.LASF73
+ 2963 0c17 01       		.byte	0x1
+ 2964 0c18 37       		.byte	0x37
+ 2965 0c19 81000000 		.4byte	0x81
+ 2966 0c1d 05       		.uleb128 0x5
+ 2967 0c1e 03       		.byte	0x3
+ 2968 0c1f 00000000 		.4byte	sacar_adc
+ 2969 0c23 1E       		.uleb128 0x1e
+ 2970 0c24 5B050000 		.4byte	.LASF74
+ 2971 0c28 01       		.byte	0x1
+ 2972 0c29 38       		.byte	0x38
+ 2973 0c2a 8D000000 		.4byte	0x8d
+ 2974 0c2e 05       		.uleb128 0x5
+ 2975 0c2f 03       		.byte	0x3
+ 2976 0c30 00000000 		.4byte	limite_temp
+ 2977 0c34 1E       		.uleb128 0x1e
+ 2978 0c35 67050000 		.4byte	.LASF75
+ 2979 0c39 01       		.byte	0x1
+ 2980 0c3a 39       		.byte	0x39
+ 2981 0c3b 8D000000 		.4byte	0x8d
+ 2982 0c3f 05       		.uleb128 0x5
+ 2983 0c40 03       		.byte	0x3
+ 2984 0c41 00000000 		.4byte	limite_hum
+ 2985 0c45 1E       		.uleb128 0x1e
+ 2986 0c46 18030000 		.4byte	.LASF76
+ 2987 0c4a 01       		.byte	0x1
+ 2988 0c4b 3A       		.byte	0x3a
+ 2989 0c4c 81000000 		.4byte	0x81
+ 2990 0c50 05       		.uleb128 0x5
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 64
+
+
+ 2991 0c51 03       		.byte	0x3
+ 2992 0c52 00000000 		.4byte	alarma_temPeligro
+ 2993 0c56 1E       		.uleb128 0x1e
+ 2994 0c57 44010000 		.4byte	.LASF77
+ 2995 0c5b 01       		.byte	0x1
+ 2996 0c5c 3B       		.byte	0x3b
+ 2997 0c5d 81000000 		.4byte	0x81
+ 2998 0c61 05       		.uleb128 0x5
+ 2999 0c62 03       		.byte	0x3
+ 3000 0c63 00000000 		.4byte	alarma_humPeligro
+ 3001 0c67 1E       		.uleb128 0x1e
+ 3002 0c68 80000000 		.4byte	.LASF78
+ 3003 0c6c 01       		.byte	0x1
+ 3004 0c6d 3C       		.byte	0x3c
+ 3005 0c6e 81000000 		.4byte	0x81
+ 3006 0c72 05       		.uleb128 0x5
+ 3007 0c73 03       		.byte	0x3
+ 3008 0c74 00000000 		.4byte	alarma_ambasPeligro
+ 3009 0c78 1E       		.uleb128 0x1e
+ 3010 0c79 F7010000 		.4byte	.LASF79
+ 3011 0c7d 01       		.byte	0x1
+ 3012 0c7e 3D       		.byte	0x3d
+ 3013 0c7f 81000000 		.4byte	0x81
+ 3014 0c83 05       		.uleb128 0x5
+ 3015 0c84 03       		.byte	0x3
+ 3016 0c85 00000000 		.4byte	alarma_yapasotiempo
+ 3017 0c89 1E       		.uleb128 0x1e
+ 3018 0c8a 2E010000 		.4byte	.LASF80
+ 3019 0c8e 01       		.byte	0x1
+ 3020 0c8f 3E       		.byte	0x3e
+ 3021 0c90 81000000 		.4byte	0x81
+ 3022 0c94 05       		.uleb128 0x5
+ 3023 0c95 03       		.byte	0x3
+ 3024 0c96 00000000 		.4byte	encender_alarma_ambas
+ 3025 0c9a 1E       		.uleb128 0x1e
+ 3026 0c9b A8050000 		.4byte	.LASF81
+ 3027 0c9f 01       		.byte	0x1
+ 3028 0ca0 3F       		.byte	0x3f
+ 3029 0ca1 8D000000 		.4byte	0x8d
+ 3030 0ca5 05       		.uleb128 0x5
+ 3031 0ca6 03       		.byte	0x3
+ 3032 0ca7 00000000 		.4byte	contador_muestras
+ 3033 0cab 1E       		.uleb128 0x1e
+ 3034 0cac 4B060000 		.4byte	.LASF82
+ 3035 0cb0 01       		.byte	0x1
+ 3036 0cb1 40       		.byte	0x40
+ 3037 0cb2 81000000 		.4byte	0x81
+ 3038 0cb6 05       		.uleb128 0x5
+ 3039 0cb7 03       		.byte	0x3
+ 3040 0cb8 00000000 		.4byte	bot1
+ 3041 0cbc 1E       		.uleb128 0x1e
+ 3042 0cbd DD000000 		.4byte	.LASF83
+ 3043 0cc1 01       		.byte	0x1
+ 3044 0cc2 41       		.byte	0x41
+ 3045 0cc3 8D000000 		.4byte	0x8d
+ 3046 0cc7 05       		.uleb128 0x5
+ 3047 0cc8 03       		.byte	0x3
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 65
+
+
+ 3048 0cc9 00000000 		.4byte	SEGUNDOS
+ 3049 0ccd 1E       		.uleb128 0x1e
+ 3050 0cce B2010000 		.4byte	.LASF84
+ 3051 0cd2 01       		.byte	0x1
+ 3052 0cd3 42       		.byte	0x42
+ 3053 0cd4 8D000000 		.4byte	0x8d
+ 3054 0cd8 05       		.uleb128 0x5
+ 3055 0cd9 03       		.byte	0x3
+ 3056 0cda 00000000 		.4byte	humedad_medida
+ 3057 0cde 1E       		.uleb128 0x1e
+ 3058 0cdf 7A050000 		.4byte	.LASF85
+ 3059 0ce3 01       		.byte	0x1
+ 3060 0ce4 43       		.byte	0x43
+ 3061 0ce5 8D000000 		.4byte	0x8d
+ 3062 0ce9 05       		.uleb128 0x5
+ 3063 0cea 03       		.byte	0x3
+ 3064 0ceb 00000000 		.4byte	temperatura_medida
+ 3065 0cef 1E       		.uleb128 0x1e
+ 3066 0cf0 35030000 		.4byte	.LASF86
+ 3067 0cf4 01       		.byte	0x1
+ 3068 0cf5 44       		.byte	0x44
+ 3069 0cf6 31010000 		.4byte	0x131
+ 3070 0cfa 05       		.uleb128 0x5
+ 3071 0cfb 03       		.byte	0x3
+ 3072 0cfc 00000000 		.4byte	Start
+ 3073 0d00 1E       		.uleb128 0x1e
+ 3074 0d01 83020000 		.4byte	.LASF87
+ 3075 0d05 01       		.byte	0x1
+ 3076 0d06 45       		.byte	0x45
+ 3077 0d07 81000000 		.4byte	0x81
+ 3078 0d0b 05       		.uleb128 0x5
+ 3079 0d0c 03       		.byte	0x3
+ 3080 0d0d 00000000 		.4byte	apagador_alarma
+ 3081 0d11 20       		.uleb128 0x20
+ 3082 0d12 F0020000 		.4byte	.LASF30
+ 3083 0d16 F0020000 		.4byte	.LASF30
+ 3084 0d1a 01       		.byte	0x1
+ 3085 0d1b 79       		.byte	0x79
+ 3086 0d1c 20       		.uleb128 0x20
+ 3087 0d1d 50060000 		.4byte	.LASF88
+ 3088 0d21 50060000 		.4byte	.LASF88
+ 3089 0d25 08       		.byte	0x8
+ 3090 0d26 C3       		.byte	0xc3
+ 3091 0d27 20       		.uleb128 0x20
+ 3092 0d28 8D050000 		.4byte	.LASF89
+ 3093 0d2c 8D050000 		.4byte	.LASF89
+ 3094 0d30 06       		.byte	0x6
+ 3095 0d31 3A       		.byte	0x3a
+ 3096 0d32 20       		.uleb128 0x20
+ 3097 0d33 CD050000 		.4byte	.LASF90
+ 3098 0d37 CD050000 		.4byte	.LASF90
+ 3099 0d3b 06       		.byte	0x6
+ 3100 0d3c 3D       		.byte	0x3d
+ 3101 0d3d 20       		.uleb128 0x20
+ 3102 0d3e 0C050000 		.4byte	.LASF91
+ 3103 0d42 0C050000 		.4byte	.LASF91
+ 3104 0d46 06       		.byte	0x6
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 66
+
+
+ 3105 0d47 3C       		.byte	0x3c
+ 3106 0d48 20       		.uleb128 0x20
+ 3107 0d49 72050000 		.4byte	.LASF92
+ 3108 0d4d 72050000 		.4byte	.LASF92
+ 3109 0d51 09       		.byte	0x9
+ 3110 0d52 76       		.byte	0x76
+ 3111 0d53 20       		.uleb128 0x20
+ 3112 0d54 A7040000 		.4byte	.LASF93
+ 3113 0d58 A7040000 		.4byte	.LASF93
+ 3114 0d5c 06       		.byte	0x6
+ 3115 0d5d 61       		.byte	0x61
+ 3116 0d5e 20       		.uleb128 0x20
+ 3117 0d5f 84030000 		.4byte	.LASF94
+ 3118 0d63 84030000 		.4byte	.LASF94
+ 3119 0d67 06       		.byte	0x6
+ 3120 0d68 3E       		.byte	0x3e
+ 3121 0d69 20       		.uleb128 0x20
+ 3122 0d6a AA000000 		.4byte	.LASF95
+ 3123 0d6e AA000000 		.4byte	.LASF95
+ 3124 0d72 0A       		.byte	0xa
+ 3125 0d73 29       		.byte	0x29
+ 3126 0d74 20       		.uleb128 0x20
+ 3127 0d75 A4030000 		.4byte	.LASF96
+ 3128 0d79 A4030000 		.4byte	.LASF96
+ 3129 0d7d 0A       		.byte	0xa
+ 3130 0d7e 26       		.byte	0x26
+ 3131 0d7f 20       		.uleb128 0x20
+ 3132 0d80 3A020000 		.4byte	.LASF97
+ 3133 0d84 3A020000 		.4byte	.LASF97
+ 3134 0d88 06       		.byte	0x6
+ 3135 0d89 38       		.byte	0x38
+ 3136 0d8a 20       		.uleb128 0x20
+ 3137 0d8b C1010000 		.4byte	.LASF29
+ 3138 0d8f C1010000 		.4byte	.LASF29
+ 3139 0d93 01       		.byte	0x1
+ 3140 0d94 55       		.byte	0x55
+ 3141 0d95 20       		.uleb128 0x20
+ 3142 0d96 69030000 		.4byte	.LASF98
+ 3143 0d9a 69030000 		.4byte	.LASF98
+ 3144 0d9e 08       		.byte	0x8
+ 3145 0d9f 92       		.byte	0x92
+ 3146 0da0 20       		.uleb128 0x20
+ 3147 0da1 0E030000 		.4byte	.LASF99
+ 3148 0da5 0E030000 		.4byte	.LASF99
+ 3149 0da9 0B       		.byte	0xb
+ 3150 0daa 34       		.byte	0x34
+ 3151 0dab 20       		.uleb128 0x20
+ 3152 0dac EC030000 		.4byte	.LASF100
+ 3153 0db0 EC030000 		.4byte	.LASF100
+ 3154 0db4 0C       		.byte	0xc
+ 3155 0db5 4F       		.byte	0x4f
+ 3156 0db6 20       		.uleb128 0x20
+ 3157 0db7 1B020000 		.4byte	.LASF101
+ 3158 0dbb 1B020000 		.4byte	.LASF101
+ 3159 0dbf 0D       		.byte	0xd
+ 3160 0dc0 25       		.byte	0x25
+ 3161 0dc1 20       		.uleb128 0x20
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 67
+
+
+ 3162 0dc2 56010000 		.4byte	.LASF102
+ 3163 0dc6 56010000 		.4byte	.LASF102
+ 3164 0dca 0E       		.byte	0xe
+ 3165 0dcb 57       		.byte	0x57
+ 3166 0dcc 20       		.uleb128 0x20
+ 3167 0dcd E9050000 		.4byte	.LASF103
+ 3168 0dd1 E9050000 		.4byte	.LASF103
+ 3169 0dd5 06       		.byte	0x6
+ 3170 0dd6 55       		.byte	0x55
+ 3171 0dd7 20       		.uleb128 0x20
+ 3172 0dd8 36050000 		.4byte	.LASF104
+ 3173 0ddc 36050000 		.4byte	.LASF104
+ 3174 0de0 0F       		.byte	0xf
+ 3175 0de1 18       		.byte	0x18
+ 3176 0de2 20       		.uleb128 0x20
+ 3177 0de3 BA040000 		.4byte	.LASF105
+ 3178 0de7 BA040000 		.4byte	.LASF105
+ 3179 0deb 10       		.byte	0x10
+ 3180 0dec 18       		.byte	0x18
+ 3181 0ded 20       		.uleb128 0x20
+ 3182 0dee D2030000 		.4byte	.LASF106
+ 3183 0df2 D2030000 		.4byte	.LASF106
+ 3184 0df6 11       		.byte	0x11
+ 3185 0df7 18       		.byte	0x18
+ 3186 0df8 20       		.uleb128 0x20
+ 3187 0df9 11000000 		.4byte	.LASF107
+ 3188 0dfd 11000000 		.4byte	.LASF107
+ 3189 0e01 0E       		.byte	0xe
+ 3190 0e02 69       		.byte	0x69
+ 3191 0e03 20       		.uleb128 0x20
+ 3192 0e04 B4020000 		.4byte	.LASF108
+ 3193 0e08 B4020000 		.4byte	.LASF108
+ 3194 0e0c 0D       		.byte	0xd
+ 3195 0e0d 57       		.byte	0x57
+ 3196 0e0e 20       		.uleb128 0x20
+ 3197 0e0f F3000000 		.4byte	.LASF109
+ 3198 0e13 F3000000 		.4byte	.LASF109
+ 3199 0e17 0B       		.byte	0xb
+ 3200 0e18 D1       		.byte	0xd1
+ 3201 0e19 20       		.uleb128 0x20
+ 3202 0e1a 55030000 		.4byte	.LASF110
+ 3203 0e1e 55030000 		.4byte	.LASF110
+ 3204 0e22 0B       		.byte	0xb
+ 3205 0e23 39       		.byte	0x39
+ 3206 0e24 20       		.uleb128 0x20
+ 3207 0e25 61060000 		.4byte	.LASF111
+ 3208 0e29 61060000 		.4byte	.LASF111
+ 3209 0e2d 0B       		.byte	0xb
+ 3210 0e2e 3B       		.byte	0x3b
+ 3211 0e2f 20       		.uleb128 0x20
+ 3212 0e30 90030000 		.4byte	.LASF112
+ 3213 0e34 90030000 		.4byte	.LASF112
+ 3214 0e38 0B       		.byte	0xb
+ 3215 0e39 3F       		.byte	0x3f
+ 3216 0e3a 20       		.uleb128 0x20
+ 3217 0e3b 78010000 		.4byte	.LASF113
+ 3218 0e3f 78010000 		.4byte	.LASF113
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 68
+
+
+ 3219 0e43 0B       		.byte	0xb
+ 3220 0e44 D2       		.byte	0xd2
+ 3221 0e45 00       		.byte	0
+ 3222              		.section	.debug_abbrev,"",%progbits
+ 3223              	.Ldebug_abbrev0:
+ 3224 0000 01       		.uleb128 0x1
+ 3225 0001 11       		.uleb128 0x11
+ 3226 0002 01       		.byte	0x1
+ 3227 0003 25       		.uleb128 0x25
+ 3228 0004 0E       		.uleb128 0xe
+ 3229 0005 13       		.uleb128 0x13
+ 3230 0006 0B       		.uleb128 0xb
+ 3231 0007 03       		.uleb128 0x3
+ 3232 0008 0E       		.uleb128 0xe
+ 3233 0009 1B       		.uleb128 0x1b
+ 3234 000a 0E       		.uleb128 0xe
+ 3235 000b 55       		.uleb128 0x55
+ 3236 000c 17       		.uleb128 0x17
+ 3237 000d 11       		.uleb128 0x11
+ 3238 000e 01       		.uleb128 0x1
+ 3239 000f 10       		.uleb128 0x10
+ 3240 0010 17       		.uleb128 0x17
+ 3241 0011 00       		.byte	0
+ 3242 0012 00       		.byte	0
+ 3243 0013 02       		.uleb128 0x2
+ 3244 0014 24       		.uleb128 0x24
+ 3245 0015 00       		.byte	0
+ 3246 0016 0B       		.uleb128 0xb
+ 3247 0017 0B       		.uleb128 0xb
+ 3248 0018 3E       		.uleb128 0x3e
+ 3249 0019 0B       		.uleb128 0xb
+ 3250 001a 03       		.uleb128 0x3
+ 3251 001b 0E       		.uleb128 0xe
+ 3252 001c 00       		.byte	0
+ 3253 001d 00       		.byte	0
+ 3254 001e 03       		.uleb128 0x3
+ 3255 001f 16       		.uleb128 0x16
+ 3256 0020 00       		.byte	0
+ 3257 0021 03       		.uleb128 0x3
+ 3258 0022 0E       		.uleb128 0xe
+ 3259 0023 3A       		.uleb128 0x3a
+ 3260 0024 0B       		.uleb128 0xb
+ 3261 0025 3B       		.uleb128 0x3b
+ 3262 0026 0B       		.uleb128 0xb
+ 3263 0027 49       		.uleb128 0x49
+ 3264 0028 13       		.uleb128 0x13
+ 3265 0029 00       		.byte	0
+ 3266 002a 00       		.byte	0
+ 3267 002b 04       		.uleb128 0x4
+ 3268 002c 24       		.uleb128 0x24
+ 3269 002d 00       		.byte	0
+ 3270 002e 0B       		.uleb128 0xb
+ 3271 002f 0B       		.uleb128 0xb
+ 3272 0030 3E       		.uleb128 0x3e
+ 3273 0031 0B       		.uleb128 0xb
+ 3274 0032 03       		.uleb128 0x3
+ 3275 0033 08       		.uleb128 0x8
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 69
+
+
+ 3276 0034 00       		.byte	0
+ 3277 0035 00       		.byte	0
+ 3278 0036 05       		.uleb128 0x5
+ 3279 0037 16       		.uleb128 0x16
+ 3280 0038 00       		.byte	0
+ 3281 0039 03       		.uleb128 0x3
+ 3282 003a 0E       		.uleb128 0xe
+ 3283 003b 3A       		.uleb128 0x3a
+ 3284 003c 0B       		.uleb128 0xb
+ 3285 003d 3B       		.uleb128 0x3b
+ 3286 003e 05       		.uleb128 0x5
+ 3287 003f 49       		.uleb128 0x49
+ 3288 0040 13       		.uleb128 0x13
+ 3289 0041 00       		.byte	0
+ 3290 0042 00       		.byte	0
+ 3291 0043 06       		.uleb128 0x6
+ 3292 0044 13       		.uleb128 0x13
+ 3293 0045 01       		.byte	0x1
+ 3294 0046 0B       		.uleb128 0xb
+ 3295 0047 0B       		.uleb128 0xb
+ 3296 0048 3A       		.uleb128 0x3a
+ 3297 0049 0B       		.uleb128 0xb
+ 3298 004a 3B       		.uleb128 0x3b
+ 3299 004b 0B       		.uleb128 0xb
+ 3300 004c 01       		.uleb128 0x1
+ 3301 004d 13       		.uleb128 0x13
+ 3302 004e 00       		.byte	0
+ 3303 004f 00       		.byte	0
+ 3304 0050 07       		.uleb128 0x7
+ 3305 0051 0D       		.uleb128 0xd
+ 3306 0052 00       		.byte	0
+ 3307 0053 03       		.uleb128 0x3
+ 3308 0054 08       		.uleb128 0x8
+ 3309 0055 3A       		.uleb128 0x3a
+ 3310 0056 0B       		.uleb128 0xb
+ 3311 0057 3B       		.uleb128 0x3b
+ 3312 0058 0B       		.uleb128 0xb
+ 3313 0059 49       		.uleb128 0x49
+ 3314 005a 13       		.uleb128 0x13
+ 3315 005b 38       		.uleb128 0x38
+ 3316 005c 0B       		.uleb128 0xb
+ 3317 005d 00       		.byte	0
+ 3318 005e 00       		.byte	0
+ 3319 005f 08       		.uleb128 0x8
+ 3320 0060 0D       		.uleb128 0xd
+ 3321 0061 00       		.byte	0
+ 3322 0062 03       		.uleb128 0x3
+ 3323 0063 0E       		.uleb128 0xe
+ 3324 0064 3A       		.uleb128 0x3a
+ 3325 0065 0B       		.uleb128 0xb
+ 3326 0066 3B       		.uleb128 0x3b
+ 3327 0067 0B       		.uleb128 0xb
+ 3328 0068 49       		.uleb128 0x49
+ 3329 0069 13       		.uleb128 0x13
+ 3330 006a 38       		.uleb128 0x38
+ 3331 006b 0B       		.uleb128 0xb
+ 3332 006c 00       		.byte	0
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 70
+
+
+ 3333 006d 00       		.byte	0
+ 3334 006e 09       		.uleb128 0x9
+ 3335 006f 35       		.uleb128 0x35
+ 3336 0070 00       		.byte	0
+ 3337 0071 49       		.uleb128 0x49
+ 3338 0072 13       		.uleb128 0x13
+ 3339 0073 00       		.byte	0
+ 3340 0074 00       		.byte	0
+ 3341 0075 0A       		.uleb128 0xa
+ 3342 0076 01       		.uleb128 0x1
+ 3343 0077 01       		.byte	0x1
+ 3344 0078 49       		.uleb128 0x49
+ 3345 0079 13       		.uleb128 0x13
+ 3346 007a 01       		.uleb128 0x1
+ 3347 007b 13       		.uleb128 0x13
+ 3348 007c 00       		.byte	0
+ 3349 007d 00       		.byte	0
+ 3350 007e 0B       		.uleb128 0xb
+ 3351 007f 21       		.uleb128 0x21
+ 3352 0080 00       		.byte	0
+ 3353 0081 49       		.uleb128 0x49
+ 3354 0082 13       		.uleb128 0x13
+ 3355 0083 2F       		.uleb128 0x2f
+ 3356 0084 0B       		.uleb128 0xb
+ 3357 0085 00       		.byte	0
+ 3358 0086 00       		.byte	0
+ 3359 0087 0C       		.uleb128 0xc
+ 3360 0088 2E       		.uleb128 0x2e
+ 3361 0089 00       		.byte	0
+ 3362 008a 3F       		.uleb128 0x3f
+ 3363 008b 19       		.uleb128 0x19
+ 3364 008c 03       		.uleb128 0x3
+ 3365 008d 0E       		.uleb128 0xe
+ 3366 008e 3A       		.uleb128 0x3a
+ 3367 008f 0B       		.uleb128 0xb
+ 3368 0090 3B       		.uleb128 0x3b
+ 3369 0091 05       		.uleb128 0x5
+ 3370 0092 27       		.uleb128 0x27
+ 3371 0093 19       		.uleb128 0x19
+ 3372 0094 11       		.uleb128 0x11
+ 3373 0095 01       		.uleb128 0x1
+ 3374 0096 12       		.uleb128 0x12
+ 3375 0097 06       		.uleb128 0x6
+ 3376 0098 40       		.uleb128 0x40
+ 3377 0099 18       		.uleb128 0x18
+ 3378 009a 9742     		.uleb128 0x2117
+ 3379 009c 19       		.uleb128 0x19
+ 3380 009d 00       		.byte	0
+ 3381 009e 00       		.byte	0
+ 3382 009f 0D       		.uleb128 0xd
+ 3383 00a0 2E       		.uleb128 0x2e
+ 3384 00a1 01       		.byte	0x1
+ 3385 00a2 3F       		.uleb128 0x3f
+ 3386 00a3 19       		.uleb128 0x19
+ 3387 00a4 03       		.uleb128 0x3
+ 3388 00a5 0E       		.uleb128 0xe
+ 3389 00a6 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 71
+
+
+ 3390 00a7 0B       		.uleb128 0xb
+ 3391 00a8 3B       		.uleb128 0x3b
+ 3392 00a9 0B       		.uleb128 0xb
+ 3393 00aa 27       		.uleb128 0x27
+ 3394 00ab 19       		.uleb128 0x19
+ 3395 00ac 49       		.uleb128 0x49
+ 3396 00ad 13       		.uleb128 0x13
+ 3397 00ae 8701     		.uleb128 0x87
+ 3398 00b0 19       		.uleb128 0x19
+ 3399 00b1 11       		.uleb128 0x11
+ 3400 00b2 01       		.uleb128 0x1
+ 3401 00b3 12       		.uleb128 0x12
+ 3402 00b4 06       		.uleb128 0x6
+ 3403 00b5 40       		.uleb128 0x40
+ 3404 00b6 18       		.uleb128 0x18
+ 3405 00b7 9642     		.uleb128 0x2116
+ 3406 00b9 19       		.uleb128 0x19
+ 3407 00ba 01       		.uleb128 0x1
+ 3408 00bb 13       		.uleb128 0x13
+ 3409 00bc 00       		.byte	0
+ 3410 00bd 00       		.byte	0
+ 3411 00be 0E       		.uleb128 0xe
+ 3412 00bf 2E       		.uleb128 0x2e
+ 3413 00c0 01       		.byte	0x1
+ 3414 00c1 3F       		.uleb128 0x3f
+ 3415 00c2 19       		.uleb128 0x19
+ 3416 00c3 03       		.uleb128 0x3
+ 3417 00c4 0E       		.uleb128 0xe
+ 3418 00c5 3A       		.uleb128 0x3a
+ 3419 00c6 0B       		.uleb128 0xb
+ 3420 00c7 3B       		.uleb128 0x3b
+ 3421 00c8 0B       		.uleb128 0xb
+ 3422 00c9 49       		.uleb128 0x49
+ 3423 00ca 13       		.uleb128 0x13
+ 3424 00cb 3C       		.uleb128 0x3c
+ 3425 00cc 19       		.uleb128 0x19
+ 3426 00cd 01       		.uleb128 0x1
+ 3427 00ce 13       		.uleb128 0x13
+ 3428 00cf 00       		.byte	0
+ 3429 00d0 00       		.byte	0
+ 3430 00d1 0F       		.uleb128 0xf
+ 3431 00d2 18       		.uleb128 0x18
+ 3432 00d3 00       		.byte	0
+ 3433 00d4 00       		.byte	0
+ 3434 00d5 00       		.byte	0
+ 3435 00d6 10       		.uleb128 0x10
+ 3436 00d7 2E       		.uleb128 0x2e
+ 3437 00d8 00       		.byte	0
+ 3438 00d9 3F       		.uleb128 0x3f
+ 3439 00da 19       		.uleb128 0x19
+ 3440 00db 03       		.uleb128 0x3
+ 3441 00dc 0E       		.uleb128 0xe
+ 3442 00dd 3A       		.uleb128 0x3a
+ 3443 00de 0B       		.uleb128 0xb
+ 3444 00df 3B       		.uleb128 0x3b
+ 3445 00e0 0B       		.uleb128 0xb
+ 3446 00e1 27       		.uleb128 0x27
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 72
+
+
+ 3447 00e2 19       		.uleb128 0x19
+ 3448 00e3 3C       		.uleb128 0x3c
+ 3449 00e4 19       		.uleb128 0x19
+ 3450 00e5 00       		.byte	0
+ 3451 00e6 00       		.byte	0
+ 3452 00e7 11       		.uleb128 0x11
+ 3453 00e8 0B       		.uleb128 0xb
+ 3454 00e9 01       		.byte	0x1
+ 3455 00ea 11       		.uleb128 0x11
+ 3456 00eb 01       		.uleb128 0x1
+ 3457 00ec 12       		.uleb128 0x12
+ 3458 00ed 06       		.uleb128 0x6
+ 3459 00ee 01       		.uleb128 0x1
+ 3460 00ef 13       		.uleb128 0x13
+ 3461 00f0 00       		.byte	0
+ 3462 00f1 00       		.byte	0
+ 3463 00f2 12       		.uleb128 0x12
+ 3464 00f3 898201   		.uleb128 0x4109
+ 3465 00f6 00       		.byte	0
+ 3466 00f7 11       		.uleb128 0x11
+ 3467 00f8 01       		.uleb128 0x1
+ 3468 00f9 31       		.uleb128 0x31
+ 3469 00fa 13       		.uleb128 0x13
+ 3470 00fb 00       		.byte	0
+ 3471 00fc 00       		.byte	0
+ 3472 00fd 13       		.uleb128 0x13
+ 3473 00fe 898201   		.uleb128 0x4109
+ 3474 0101 01       		.byte	0x1
+ 3475 0102 11       		.uleb128 0x11
+ 3476 0103 01       		.uleb128 0x1
+ 3477 0104 31       		.uleb128 0x31
+ 3478 0105 13       		.uleb128 0x13
+ 3479 0106 01       		.uleb128 0x1
+ 3480 0107 13       		.uleb128 0x13
+ 3481 0108 00       		.byte	0
+ 3482 0109 00       		.byte	0
+ 3483 010a 14       		.uleb128 0x14
+ 3484 010b 8A8201   		.uleb128 0x410a
+ 3485 010e 00       		.byte	0
+ 3486 010f 02       		.uleb128 0x2
+ 3487 0110 18       		.uleb128 0x18
+ 3488 0111 9142     		.uleb128 0x2111
+ 3489 0113 18       		.uleb128 0x18
+ 3490 0114 00       		.byte	0
+ 3491 0115 00       		.byte	0
+ 3492 0116 15       		.uleb128 0x15
+ 3493 0117 898201   		.uleb128 0x4109
+ 3494 011a 01       		.byte	0x1
+ 3495 011b 11       		.uleb128 0x11
+ 3496 011c 01       		.uleb128 0x1
+ 3497 011d 31       		.uleb128 0x31
+ 3498 011e 13       		.uleb128 0x13
+ 3499 011f 00       		.byte	0
+ 3500 0120 00       		.byte	0
+ 3501 0121 16       		.uleb128 0x16
+ 3502 0122 2E       		.uleb128 0x2e
+ 3503 0123 01       		.byte	0x1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 73
+
+
+ 3504 0124 3F       		.uleb128 0x3f
+ 3505 0125 19       		.uleb128 0x19
+ 3506 0126 03       		.uleb128 0x3
+ 3507 0127 0E       		.uleb128 0xe
+ 3508 0128 3A       		.uleb128 0x3a
+ 3509 0129 0B       		.uleb128 0xb
+ 3510 012a 3B       		.uleb128 0x3b
+ 3511 012b 05       		.uleb128 0x5
+ 3512 012c 27       		.uleb128 0x27
+ 3513 012d 19       		.uleb128 0x19
+ 3514 012e 49       		.uleb128 0x49
+ 3515 012f 13       		.uleb128 0x13
+ 3516 0130 11       		.uleb128 0x11
+ 3517 0131 01       		.uleb128 0x1
+ 3518 0132 12       		.uleb128 0x12
+ 3519 0133 06       		.uleb128 0x6
+ 3520 0134 40       		.uleb128 0x40
+ 3521 0135 18       		.uleb128 0x18
+ 3522 0136 9742     		.uleb128 0x2117
+ 3523 0138 19       		.uleb128 0x19
+ 3524 0139 01       		.uleb128 0x1
+ 3525 013a 13       		.uleb128 0x13
+ 3526 013b 00       		.byte	0
+ 3527 013c 00       		.byte	0
+ 3528 013d 17       		.uleb128 0x17
+ 3529 013e 05       		.uleb128 0x5
+ 3530 013f 00       		.byte	0
+ 3531 0140 03       		.uleb128 0x3
+ 3532 0141 0E       		.uleb128 0xe
+ 3533 0142 3A       		.uleb128 0x3a
+ 3534 0143 0B       		.uleb128 0xb
+ 3535 0144 3B       		.uleb128 0x3b
+ 3536 0145 05       		.uleb128 0x5
+ 3537 0146 49       		.uleb128 0x49
+ 3538 0147 13       		.uleb128 0x13
+ 3539 0148 02       		.uleb128 0x2
+ 3540 0149 17       		.uleb128 0x17
+ 3541 014a 00       		.byte	0
+ 3542 014b 00       		.byte	0
+ 3543 014c 18       		.uleb128 0x18
+ 3544 014d 34       		.uleb128 0x34
+ 3545 014e 00       		.byte	0
+ 3546 014f 03       		.uleb128 0x3
+ 3547 0150 0E       		.uleb128 0xe
+ 3548 0151 3A       		.uleb128 0x3a
+ 3549 0152 0B       		.uleb128 0xb
+ 3550 0153 3B       		.uleb128 0x3b
+ 3551 0154 05       		.uleb128 0x5
+ 3552 0155 49       		.uleb128 0x49
+ 3553 0156 13       		.uleb128 0x13
+ 3554 0157 02       		.uleb128 0x2
+ 3555 0158 17       		.uleb128 0x17
+ 3556 0159 00       		.byte	0
+ 3557 015a 00       		.byte	0
+ 3558 015b 19       		.uleb128 0x19
+ 3559 015c 34       		.uleb128 0x34
+ 3560 015d 00       		.byte	0
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 74
+
+
+ 3561 015e 03       		.uleb128 0x3
+ 3562 015f 08       		.uleb128 0x8
+ 3563 0160 3A       		.uleb128 0x3a
+ 3564 0161 0B       		.uleb128 0xb
+ 3565 0162 3B       		.uleb128 0x3b
+ 3566 0163 05       		.uleb128 0x5
+ 3567 0164 49       		.uleb128 0x49
+ 3568 0165 13       		.uleb128 0x13
+ 3569 0166 02       		.uleb128 0x2
+ 3570 0167 17       		.uleb128 0x17
+ 3571 0168 00       		.byte	0
+ 3572 0169 00       		.byte	0
+ 3573 016a 1A       		.uleb128 0x1a
+ 3574 016b 0F       		.uleb128 0xf
+ 3575 016c 00       		.byte	0
+ 3576 016d 0B       		.uleb128 0xb
+ 3577 016e 0B       		.uleb128 0xb
+ 3578 016f 49       		.uleb128 0x49
+ 3579 0170 13       		.uleb128 0x13
+ 3580 0171 00       		.byte	0
+ 3581 0172 00       		.byte	0
+ 3582 0173 1B       		.uleb128 0x1b
+ 3583 0174 26       		.uleb128 0x26
+ 3584 0175 00       		.byte	0
+ 3585 0176 49       		.uleb128 0x49
+ 3586 0177 13       		.uleb128 0x13
+ 3587 0178 00       		.byte	0
+ 3588 0179 00       		.byte	0
+ 3589 017a 1C       		.uleb128 0x1c
+ 3590 017b 34       		.uleb128 0x34
+ 3591 017c 00       		.byte	0
+ 3592 017d 03       		.uleb128 0x3
+ 3593 017e 0E       		.uleb128 0xe
+ 3594 017f 3A       		.uleb128 0x3a
+ 3595 0180 0B       		.uleb128 0xb
+ 3596 0181 3B       		.uleb128 0x3b
+ 3597 0182 0B       		.uleb128 0xb
+ 3598 0183 49       		.uleb128 0x49
+ 3599 0184 13       		.uleb128 0x13
+ 3600 0185 3F       		.uleb128 0x3f
+ 3601 0186 19       		.uleb128 0x19
+ 3602 0187 3C       		.uleb128 0x3c
+ 3603 0188 19       		.uleb128 0x19
+ 3604 0189 00       		.byte	0
+ 3605 018a 00       		.byte	0
+ 3606 018b 1D       		.uleb128 0x1d
+ 3607 018c 34       		.uleb128 0x34
+ 3608 018d 00       		.byte	0
+ 3609 018e 03       		.uleb128 0x3
+ 3610 018f 0E       		.uleb128 0xe
+ 3611 0190 3A       		.uleb128 0x3a
+ 3612 0191 0B       		.uleb128 0xb
+ 3613 0192 3B       		.uleb128 0x3b
+ 3614 0193 05       		.uleb128 0x5
+ 3615 0194 49       		.uleb128 0x49
+ 3616 0195 13       		.uleb128 0x13
+ 3617 0196 3F       		.uleb128 0x3f
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 75
+
+
+ 3618 0197 19       		.uleb128 0x19
+ 3619 0198 3C       		.uleb128 0x3c
+ 3620 0199 19       		.uleb128 0x19
+ 3621 019a 00       		.byte	0
+ 3622 019b 00       		.byte	0
+ 3623 019c 1E       		.uleb128 0x1e
+ 3624 019d 34       		.uleb128 0x34
+ 3625 019e 00       		.byte	0
+ 3626 019f 03       		.uleb128 0x3
+ 3627 01a0 0E       		.uleb128 0xe
+ 3628 01a1 3A       		.uleb128 0x3a
+ 3629 01a2 0B       		.uleb128 0xb
+ 3630 01a3 3B       		.uleb128 0x3b
+ 3631 01a4 0B       		.uleb128 0xb
+ 3632 01a5 49       		.uleb128 0x49
+ 3633 01a6 13       		.uleb128 0x13
+ 3634 01a7 3F       		.uleb128 0x3f
+ 3635 01a8 19       		.uleb128 0x19
+ 3636 01a9 02       		.uleb128 0x2
+ 3637 01aa 18       		.uleb128 0x18
+ 3638 01ab 00       		.byte	0
+ 3639 01ac 00       		.byte	0
+ 3640 01ad 1F       		.uleb128 0x1f
+ 3641 01ae 34       		.uleb128 0x34
+ 3642 01af 00       		.byte	0
+ 3643 01b0 03       		.uleb128 0x3
+ 3644 01b1 08       		.uleb128 0x8
+ 3645 01b2 3A       		.uleb128 0x3a
+ 3646 01b3 0B       		.uleb128 0xb
+ 3647 01b4 3B       		.uleb128 0x3b
+ 3648 01b5 0B       		.uleb128 0xb
+ 3649 01b6 49       		.uleb128 0x49
+ 3650 01b7 13       		.uleb128 0x13
+ 3651 01b8 3F       		.uleb128 0x3f
+ 3652 01b9 19       		.uleb128 0x19
+ 3653 01ba 02       		.uleb128 0x2
+ 3654 01bb 18       		.uleb128 0x18
+ 3655 01bc 00       		.byte	0
+ 3656 01bd 00       		.byte	0
+ 3657 01be 20       		.uleb128 0x20
+ 3658 01bf 2E       		.uleb128 0x2e
+ 3659 01c0 00       		.byte	0
+ 3660 01c1 3F       		.uleb128 0x3f
+ 3661 01c2 19       		.uleb128 0x19
+ 3662 01c3 3C       		.uleb128 0x3c
+ 3663 01c4 19       		.uleb128 0x19
+ 3664 01c5 6E       		.uleb128 0x6e
+ 3665 01c6 0E       		.uleb128 0xe
+ 3666 01c7 03       		.uleb128 0x3
+ 3667 01c8 0E       		.uleb128 0xe
+ 3668 01c9 3A       		.uleb128 0x3a
+ 3669 01ca 0B       		.uleb128 0xb
+ 3670 01cb 3B       		.uleb128 0x3b
+ 3671 01cc 0B       		.uleb128 0xb
+ 3672 01cd 00       		.byte	0
+ 3673 01ce 00       		.byte	0
+ 3674 01cf 00       		.byte	0
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 76
+
+
+ 3675              		.section	.debug_loc,"",%progbits
+ 3676              	.Ldebug_loc0:
+ 3677              	.LLST0:
+ 3678 0000 00000000 		.4byte	.LVL98
+ 3679 0004 16000000 		.4byte	.LVL103
+ 3680 0008 0100     		.2byte	0x1
+ 3681 000a 50       		.byte	0x50
+ 3682 000b 16000000 		.4byte	.LVL103
+ 3683 000f 26000000 		.4byte	.LVL107
+ 3684 0013 0100     		.2byte	0x1
+ 3685 0015 50       		.byte	0x50
+ 3686 0016 28000000 		.4byte	.LVL108
+ 3687 001a 2A000000 		.4byte	.LVL109
+ 3688 001e 0100     		.2byte	0x1
+ 3689 0020 50       		.byte	0x50
+ 3690 0021 00000000 		.4byte	0
+ 3691 0025 00000000 		.4byte	0
+ 3692              	.LLST1:
+ 3693 0029 00000000 		.4byte	.LVL98
+ 3694 002d 18000000 		.4byte	.LVL104
+ 3695 0031 0100     		.2byte	0x1
+ 3696 0033 51       		.byte	0x51
+ 3697 0034 18000000 		.4byte	.LVL104
+ 3698 0038 2E000000 		.4byte	.LFE67
+ 3699 003c 0100     		.2byte	0x1
+ 3700 003e 51       		.byte	0x51
+ 3701 003f 00000000 		.4byte	0
+ 3702 0043 00000000 		.4byte	0
+ 3703              	.LLST2:
+ 3704 0047 02000000 		.4byte	.LVL99
+ 3705 004b 08000000 		.4byte	.LVL100
+ 3706 004f 0200     		.2byte	0x2
+ 3707 0051 30       		.byte	0x30
+ 3708 0052 9F       		.byte	0x9f
+ 3709 0053 08000000 		.4byte	.LVL100
+ 3710 0057 12000000 		.4byte	.LVL101
+ 3711 005b 0100     		.2byte	0x1
+ 3712 005d 55       		.byte	0x55
+ 3713 005e 14000000 		.4byte	.LVL102
+ 3714 0062 2C000000 		.4byte	.LVL110
+ 3715 0066 0100     		.2byte	0x1
+ 3716 0068 55       		.byte	0x55
+ 3717 0069 00000000 		.4byte	0
+ 3718 006d 00000000 		.4byte	0
+ 3719              	.LLST3:
+ 3720 0071 02000000 		.4byte	.LVL99
+ 3721 0075 08000000 		.4byte	.LVL100
+ 3722 0079 0200     		.2byte	0x2
+ 3723 007b 30       		.byte	0x30
+ 3724 007c 9F       		.byte	0x9f
+ 3725 007d 08000000 		.4byte	.LVL100
+ 3726 0081 1A000000 		.4byte	.LVL105
+ 3727 0085 0100     		.2byte	0x1
+ 3728 0087 53       		.byte	0x53
+ 3729 0088 1C000000 		.4byte	.LVL106
+ 3730 008c 2E000000 		.4byte	.LFE67
+ 3731 0090 0100     		.2byte	0x1
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 77
+
+
+ 3732 0092 53       		.byte	0x53
+ 3733 0093 00000000 		.4byte	0
+ 3734 0097 00000000 		.4byte	0
+ 3735              		.section	.debug_aranges,"",%progbits
+ 3736 0000 3C000000 		.4byte	0x3c
+ 3737 0004 0200     		.2byte	0x2
+ 3738 0006 00000000 		.4byte	.Ldebug_info0
+ 3739 000a 04       		.byte	0x4
+ 3740 000b 00       		.byte	0
+ 3741 000c 0000     		.2byte	0
+ 3742 000e 0000     		.2byte	0
+ 3743 0010 00000000 		.4byte	.LFB64
+ 3744 0014 0C000000 		.4byte	.LFE64-.LFB64
+ 3745 0018 00000000 		.4byte	.LFB65
+ 3746 001c 10000000 		.4byte	.LFE65-.LFB65
+ 3747 0020 00000000 		.4byte	.LFB66
+ 3748 0024 0C000000 		.4byte	.LFE66-.LFB66
+ 3749 0028 00000000 		.4byte	.LFB63
+ 3750 002c 30060000 		.4byte	.LFE63-.LFB63
+ 3751 0030 00000000 		.4byte	.LFB67
+ 3752 0034 2E000000 		.4byte	.LFE67-.LFB67
+ 3753 0038 00000000 		.4byte	0
+ 3754 003c 00000000 		.4byte	0
+ 3755              		.section	.debug_ranges,"",%progbits
+ 3756              	.Ldebug_ranges0:
+ 3757 0000 00000000 		.4byte	.LFB64
+ 3758 0004 0C000000 		.4byte	.LFE64
+ 3759 0008 00000000 		.4byte	.LFB65
+ 3760 000c 10000000 		.4byte	.LFE65
+ 3761 0010 00000000 		.4byte	.LFB66
+ 3762 0014 0C000000 		.4byte	.LFE66
+ 3763 0018 00000000 		.4byte	.LFB63
+ 3764 001c 30060000 		.4byte	.LFE63
+ 3765 0020 00000000 		.4byte	.LFB67
+ 3766 0024 2E000000 		.4byte	.LFE67
+ 3767 0028 00000000 		.4byte	0
+ 3768 002c 00000000 		.4byte	0
+ 3769              		.section	.debug_line,"",%progbits
+ 3770              	.Ldebug_line0:
+ 3771 0000 90030000 		.section	.debug_str,"MS",%progbits,1
+ 3771      0200D601 
+ 3771      00000201 
+ 3771      FB0E0D00 
+ 3771      01010101 
+ 3772              	.LASF12:
+ 3773 0000 75696E74 		.ascii	"uint16\000"
+ 3773      313600
+ 3774              	.LASF68:
+ 3775 0007 6D696E5F 		.ascii	"min_crono\000"
+ 3775      63726F6E 
+ 3775      6F00
+ 3776              	.LASF107:
+ 3777 0011 4C45445F 		.ascii	"LED_Driver_1_Write7SegDigitDec\000"
+ 3777      44726976 
+ 3777      65725F31 
+ 3777      5F577269 
+ 3777      74653753 
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 78
+
+
+ 3778              	.LASF116:
+ 3779 0030 433A5C55 		.ascii	"C:\\Users\\ADMH2\\Documents\\PSoC Creator\\P6\\P6_1"
+ 3779      73657273 
+ 3779      5C41444D 
+ 3779      48325C44 
+ 3779      6F63756D 
+ 3780 005d 2E637964 		.ascii	".cydsn\000"
+ 3780      736E00
+ 3781              	.LASF48:
+ 3782 0064 636F6D70 		.ascii	"comparado\000"
+ 3782      61726164 
+ 3782      6F00
+ 3783              	.LASF39:
+ 3784 006e 7465636C 		.ascii	"tecla\000"
+ 3784      6100
+ 3785              	.LASF0:
+ 3786 0074 7369676E 		.ascii	"signed char\000"
+ 3786      65642063 
+ 3786      68617200 
+ 3787              	.LASF78:
+ 3788 0080 616C6172 		.ascii	"alarma_ambasPeligro\000"
+ 3788      6D615F61 
+ 3788      6D626173 
+ 3788      50656C69 
+ 3788      67726F00 
+ 3789              	.LASF51:
+ 3790 0094 73656E61 		.ascii	"senal_temp\000"
+ 3790      6C5F7465 
+ 3790      6D7000
+ 3791              	.LASF65:
+ 3792 009f 68756D65 		.ascii	"humedad_in\000"
+ 3792      6461645F 
+ 3792      696E00
+ 3793              	.LASF95:
+ 3794 00aa 6C65645F 		.ascii	"led_Read\000"
+ 3794      52656164 
+ 3794      00
+ 3795              	.LASF66:
+ 3796 00b3 7469656D 		.ascii	"tiempo_in\000"
+ 3796      706F5F69 
+ 3796      6E00
+ 3797              	.LASF7:
+ 3798 00bd 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 3798      206C6F6E 
+ 3798      6720756E 
+ 3798      7369676E 
+ 3798      65642069 
+ 3799              	.LASF40:
+ 3800 00d4 636F756E 		.ascii	"countpot\000"
+ 3800      74706F74 
+ 3800      00
+ 3801              	.LASF83:
+ 3802 00dd 53454755 		.ascii	"SEGUNDOS\000"
+ 3802      4E444F53 
+ 3802      00
+ 3803              	.LASF35:
+ 3804 00e6 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 79
+
+
+ 3804      52784275 
+ 3804      66666572 
+ 3804      00
+ 3805              	.LASF109:
+ 3806 00f3 4144435F 		.ascii	"ADC_StartConvert\000"
+ 3806      53746172 
+ 3806      74436F6E 
+ 3806      76657274 
+ 3806      00
+ 3807              	.LASF34:
+ 3808 0104 4C43445F 		.ascii	"LCD_customFonts\000"
+ 3808      63757374 
+ 3808      6F6D466F 
+ 3808      6E747300 
+ 3809              	.LASF38:
+ 3810 0114 616E6775 		.ascii	"angulo\000"
+ 3810      6C6F00
+ 3811              	.LASF6:
+ 3812 011b 6C6F6E67 		.ascii	"long long int\000"
+ 3812      206C6F6E 
+ 3812      6720696E 
+ 3812      7400
+ 3813              	.LASF44:
+ 3814 0129 6F686E6F 		.ascii	"ohno\000"
+ 3814      00
+ 3815              	.LASF80:
+ 3816 012e 656E6365 		.ascii	"encender_alarma_ambas\000"
+ 3816      6E646572 
+ 3816      5F616C61 
+ 3816      726D615F 
+ 3816      616D6261 
+ 3817              	.LASF77:
+ 3818 0144 616C6172 		.ascii	"alarma_humPeligro\000"
+ 3818      6D615F68 
+ 3818      756D5065 
+ 3818      6C696772 
+ 3818      6F00
+ 3819              	.LASF102:
+ 3820 0156 4C45445F 		.ascii	"LED_Driver_1_Start\000"
+ 3820      44726976 
+ 3820      65725F31 
+ 3820      5F537461 
+ 3820      727400
+ 3821              	.LASF4:
+ 3822 0169 6C6F6E67 		.ascii	"long int\000"
+ 3822      20696E74 
+ 3822      00
+ 3823              	.LASF23:
+ 3824 0172 4D6F6E74 		.ascii	"Month\000"
+ 3824      6800
+ 3825              	.LASF113:
+ 3826 0178 4144435F 		.ascii	"ADC_StopConvert\000"
+ 3826      53746F70 
+ 3826      436F6E76 
+ 3826      65727400 
+ 3827              	.LASF11:
+ 3828 0188 75696E74 		.ascii	"uint8\000"
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 80
+
+
+ 3828      3800
+ 3829              	.LASF57:
+ 3830 018e 436C6176 		.ascii	"ClaveOriginal\000"
+ 3830      654F7269 
+ 3830      67696E61 
+ 3830      6C00
+ 3831              	.LASF15:
+ 3832 019c 646F7562 		.ascii	"double\000"
+ 3832      6C6500
+ 3833              	.LASF71:
+ 3834 01a3 696E6963 		.ascii	"iniciar_conteo\000"
+ 3834      6961725F 
+ 3834      636F6E74 
+ 3834      656F00
+ 3835              	.LASF84:
+ 3836 01b2 68756D65 		.ascii	"humedad_medida\000"
+ 3836      6461645F 
+ 3836      6D656469 
+ 3836      646100
+ 3837              	.LASF29:
+ 3838 01c1 5465636C 		.ascii	"Teclado_Start\000"
+ 3838      61646F5F 
+ 3838      53746172 
+ 3838      7400
+ 3839              	.LASF13:
+ 3840 01cf 75696E74 		.ascii	"uint32\000"
+ 3840      333200
+ 3841              	.LASF69:
+ 3842 01d6 73656775 		.ascii	"segundos_crono\000"
+ 3842      6E646F73 
+ 3842      5F63726F 
+ 3842      6E6F00
+ 3843              	.LASF72:
+ 3844 01e5 6D6F7374 		.ascii	"mostrar_EnCilolcd\000"
+ 3844      7261725F 
+ 3844      456E4369 
+ 3844      6C6F6C63 
+ 3844      6400
+ 3845              	.LASF79:
+ 3846 01f7 616C6172 		.ascii	"alarma_yapasotiempo\000"
+ 3846      6D615F79 
+ 3846      61706173 
+ 3846      6F746965 
+ 3846      6D706F00 
+ 3847              	.LASF62:
+ 3848 020b 68756D65 		.ascii	"humedad_anadida\000"
+ 3848      6461645F 
+ 3848      616E6164 
+ 3848      69646100 
+ 3849              	.LASF101:
+ 3850 021b 414D7578 		.ascii	"AMux_1_Start\000"
+ 3850      5F315F53 
+ 3850      74617274 
+ 3850      00
+ 3851              	.LASF58:
+ 3852 0228 74656D70 		.ascii	"temp\000"
+ 3852      00
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 81
+
+
+ 3853              	.LASF8:
+ 3854 022d 756E7369 		.ascii	"unsigned int\000"
+ 3854      676E6564 
+ 3854      20696E74 
+ 3854      00
+ 3855              	.LASF97:
+ 3856 023a 4C43445F 		.ascii	"LCD_Start\000"
+ 3856      53746172 
+ 3856      7400
+ 3857              	.LASF5:
+ 3858 0244 6C6F6E67 		.ascii	"long unsigned int\000"
+ 3858      20756E73 
+ 3858      69676E65 
+ 3858      6420696E 
+ 3858      7400
+ 3859              	.LASF60:
+ 3860 0256 696E6772 		.ascii	"ingresando_valores\000"
+ 3860      6573616E 
+ 3860      646F5F76 
+ 3860      616C6F72 
+ 3860      657300
+ 3861              	.LASF55:
+ 3862 0269 70756572 		.ascii	"puerta_cerrada\000"
+ 3862      74615F63 
+ 3862      65727261 
+ 3862      646100
+ 3863              	.LASF21:
+ 3864 0278 4461794F 		.ascii	"DayOfMonth\000"
+ 3864      664D6F6E 
+ 3864      746800
+ 3865              	.LASF87:
+ 3866 0283 61706167 		.ascii	"apagador_alarma\000"
+ 3866      61646F72 
+ 3866      5F616C61 
+ 3866      726D6100 
+ 3867              	.LASF3:
+ 3868 0293 73686F72 		.ascii	"short unsigned int\000"
+ 3868      7420756E 
+ 3868      7369676E 
+ 3868      65642069 
+ 3868      6E7400
+ 3869              	.LASF26:
+ 3870 02a6 6B657962 		.ascii	"keyboard\000"
+ 3870      6F617264 
+ 3870      00
+ 3871              	.LASF24:
+ 3872 02af 59656172 		.ascii	"Year\000"
+ 3872      00
+ 3873              	.LASF108:
+ 3874 02b4 414D7578 		.ascii	"AMux_1_Select\000"
+ 3874      5F315F53 
+ 3874      656C6563 
+ 3874      7400
+ 3875              	.LASF54:
+ 3876 02c2 66696E69 		.ascii	"finishpass\000"
+ 3876      73687061 
+ 3876      737300
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 82
+
+
+ 3877              	.LASF115:
+ 3878 02cd 6D61696E 		.ascii	"main.c\000"
+ 3878      2E6300
+ 3879              	.LASF46:
+ 3880 02d4 73616C69 		.ascii	"salida\000"
+ 3880      646100
+ 3881              	.LASF2:
+ 3882 02db 73686F72 		.ascii	"short int\000"
+ 3882      7420696E 
+ 3882      7400
+ 3883              	.LASF50:
+ 3884 02e5 73656E61 		.ascii	"senal_hume\000"
+ 3884      6C5F6875 
+ 3884      6D6500
+ 3885              	.LASF30:
+ 3886 02f0 5465636C 		.ascii	"Teclado_AsignarTecla\000"
+ 3886      61646F5F 
+ 3886      41736967 
+ 3886      6E617254 
+ 3886      65636C61 
+ 3887              	.LASF18:
+ 3888 0305 73697A65 		.ascii	"sizetype\000"
+ 3888      74797065 
+ 3888      00
+ 3889              	.LASF99:
+ 3890 030e 4144435F 		.ascii	"ADC_Start\000"
+ 3890      53746172 
+ 3890      7400
+ 3891              	.LASF76:
+ 3892 0318 616C6172 		.ascii	"alarma_temPeligro\000"
+ 3892      6D615F74 
+ 3892      656D5065 
+ 3892      6C696772 
+ 3892      6F00
+ 3893              	.LASF45:
+ 3894 032a 4553434F 		.ascii	"ESCORRECTO\000"
+ 3894      52524543 
+ 3894      544F00
+ 3895              	.LASF86:
+ 3896 0335 53746172 		.ascii	"Start\000"
+ 3896      7400
+ 3897              	.LASF25:
+ 3898 033b 5254435F 		.ascii	"RTC_TIME_DATE\000"
+ 3898      54494D45 
+ 3898      5F444154 
+ 3898      4500
+ 3899              	.LASF42:
+ 3900 0349 7465636C 		.ascii	"tecladoband\000"
+ 3900      61646F62 
+ 3900      616E6400 
+ 3901              	.LASF110:
+ 3902 0355 4144435F 		.ascii	"ADC_IsEndConversion\000"
+ 3902      4973456E 
+ 3902      64436F6E 
+ 3902      76657273 
+ 3902      696F6E00 
+ 3903              	.LASF98:
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 83
+
+
+ 3904 0369 50574D5F 		.ascii	"PWM_Start\000"
+ 3904      53746172 
+ 3904      7400
+ 3905              	.LASF52:
+ 3906 0373 6D696C69 		.ascii	"milivolt_h\000"
+ 3906      766F6C74 
+ 3906      5F6800
+ 3907              	.LASF14:
+ 3908 037e 666C6F61 		.ascii	"float\000"
+ 3908      7400
+ 3909              	.LASF94:
+ 3910 0384 4C43445F 		.ascii	"LCD_PutChar\000"
+ 3910      50757443 
+ 3910      68617200 
+ 3911              	.LASF112:
+ 3912 0390 4144435F 		.ascii	"ADC_CountsTo_mVolts\000"
+ 3912      436F756E 
+ 3912      7473546F 
+ 3912      5F6D566F 
+ 3912      6C747300 
+ 3913              	.LASF96:
+ 3914 03a4 6C65645F 		.ascii	"led_Write\000"
+ 3914      57726974 
+ 3914      6500
+ 3915              	.LASF10:
+ 3916 03ae 696E7433 		.ascii	"int32_t\000"
+ 3916      325F7400 
+ 3917              	.LASF1:
+ 3918 03b6 756E7369 		.ascii	"unsigned char\000"
+ 3918      676E6564 
+ 3918      20636861 
+ 3918      7200
+ 3919              	.LASF53:
+ 3920 03c4 6D696C69 		.ascii	"milivolt_temp\000"
+ 3920      766F6C74 
+ 3920      5F74656D 
+ 3920      7000
+ 3921              	.LASF106:
+ 3922 03d2 6C6F676F 		.ascii	"logoutisr_StartEx\000"
+ 3922      75746973 
+ 3922      725F5374 
+ 3922      61727445 
+ 3922      7800
+ 3923              	.LASF64:
+ 3924 03e4 74656D70 		.ascii	"temp_in\000"
+ 3924      5F696E00 
+ 3925              	.LASF100:
+ 3926 03ec 436F6E74 		.ascii	"Contaor_Start\000"
+ 3926      616F725F 
+ 3926      53746172 
+ 3926      7400
+ 3927              	.LASF118:
+ 3928 03fa 436F6D70 		.ascii	"CompararClave\000"
+ 3928      61726172 
+ 3928      436C6176 
+ 3928      6500
+ 3929              	.LASF36:
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 84
+
+
+ 3930 0408 76616C70 		.ascii	"valpot\000"
+ 3930      6F7400
+ 3931              	.LASF20:
+ 3932 040f 4461794F 		.ascii	"DayOfWeek\000"
+ 3932      66576565 
+ 3932      6B00
+ 3933              	.LASF114:
+ 3934 0419 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 3934      43313120 
+ 3934      352E342E 
+ 3934      31203230 
+ 3934      31363036 
+ 3935 044c 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 3935      20726576 
+ 3935      6973696F 
+ 3935      6E203233 
+ 3935      37373135 
+ 3936 047f 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 3936      66756E63 
+ 3936      74696F6E 
+ 3936      2D736563 
+ 3936      74696F6E 
+ 3937              	.LASF93:
+ 3938 04a7 4C43445F 		.ascii	"LCD_PrintU32Number\000"
+ 3938      5072696E 
+ 3938      74553332 
+ 3938      4E756D62 
+ 3938      657200
+ 3939              	.LASF105:
+ 3940 04ba 55616E4D 		.ascii	"UanMS_StartEx\000"
+ 3940      535F5374 
+ 3940      61727445 
+ 3940      7800
+ 3941              	.LASF32:
+ 3942 04c8 4F726967 		.ascii	"Original\000"
+ 3942      696E616C 
+ 3942      00
+ 3943              	.LASF70:
+ 3944 04d1 6D696C69 		.ascii	"miliseg_crono\000"
+ 3944      7365675F 
+ 3944      63726F6E 
+ 3944      6F00
+ 3945              	.LASF33:
+ 3946 04df 41636965 		.ascii	"Aciertos\000"
+ 3946      72746F73 
+ 3946      00
+ 3947              	.LASF19:
+ 3948 04e8 486F7572 		.ascii	"Hour\000"
+ 3948      00
+ 3949              	.LASF17:
+ 3950 04ed 6C6F6E67 		.ascii	"long double\000"
+ 3950      20646F75 
+ 3950      626C6500 
+ 3951              	.LASF49:
+ 3952 04f9 6369636C 		.ascii	"ciclo_acabado\000"
+ 3952      6F5F6163 
+ 3952      61626164 
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 85
+
+
+ 3952      6F00
+ 3953              	.LASF16:
+ 3954 0507 63686172 		.ascii	"char\000"
+ 3954      00
+ 3955              	.LASF91:
+ 3956 050c 4C43445F 		.ascii	"LCD_PrintString\000"
+ 3956      5072696E 
+ 3956      74537472 
+ 3956      696E6700 
+ 3957              	.LASF28:
+ 3958 051c 65786969 		.ascii	"exiit\000"
+ 3958      7400
+ 3959              	.LASF61:
+ 3960 0522 74656D70 		.ascii	"temperatura_anadida\000"
+ 3960      65726174 
+ 3960      7572615F 
+ 3960      616E6164 
+ 3960      69646100 
+ 3961              	.LASF104:
+ 3962 0536 4953525F 		.ascii	"ISR_Key_StartEx\000"
+ 3962      4B65795F 
+ 3962      53746172 
+ 3962      74457800 
+ 3963              	.LASF37:
+ 3964 0546 7469706F 		.ascii	"tipounidad\000"
+ 3964      756E6964 
+ 3964      616400
+ 3965              	.LASF9:
+ 3966 0551 5F5F696E 		.ascii	"__int32_t\000"
+ 3966      7433325F 
+ 3966      7400
+ 3967              	.LASF74:
+ 3968 055b 6C696D69 		.ascii	"limite_temp\000"
+ 3968      74655F74 
+ 3968      656D7000 
+ 3969              	.LASF75:
+ 3970 0567 6C696D69 		.ascii	"limite_hum\000"
+ 3970      74655F68 
+ 3970      756D00
+ 3971              	.LASF92:
+ 3972 0572 43794465 		.ascii	"CyDelay\000"
+ 3972      6C617900 
+ 3973              	.LASF85:
+ 3974 057a 74656D70 		.ascii	"temperatura_medida\000"
+ 3974      65726174 
+ 3974      7572615F 
+ 3974      6D656469 
+ 3974      646100
+ 3975              	.LASF89:
+ 3976 058d 4C43445F 		.ascii	"LCD_WriteControl\000"
+ 3976      57726974 
+ 3976      65436F6E 
+ 3976      74726F6C 
+ 3976      00
+ 3977              	.LASF73:
+ 3978 059e 73616361 		.ascii	"sacar_adc\000"
+ 3978      725F6164 
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 86
+
+
+ 3978      6300
+ 3979              	.LASF81:
+ 3980 05a8 636F6E74 		.ascii	"contador_muestras\000"
+ 3980      61646F72 
+ 3980      5F6D7565 
+ 3980      73747261 
+ 3980      7300
+ 3981              	.LASF59:
+ 3982 05ba 68756D65 		.ascii	"humedad\000"
+ 3982      64616400 
+ 3983              	.LASF47:
+ 3984 05c2 636F756E 		.ascii	"counterOut\000"
+ 3984      7465724F 
+ 3984      757400
+ 3985              	.LASF90:
+ 3986 05cd 4C43445F 		.ascii	"LCD_Position\000"
+ 3986      506F7369 
+ 3986      74696F6E 
+ 3986      00
+ 3987              	.LASF63:
+ 3988 05da 7469656D 		.ascii	"tiempo_anadido\000"
+ 3988      706F5F61 
+ 3988      6E616469 
+ 3988      646F00
+ 3989              	.LASF103:
+ 3990 05e9 4C43445F 		.ascii	"LCD_LoadCustomFonts\000"
+ 3990      4C6F6164 
+ 3990      43757374 
+ 3990      6F6D466F 
+ 3990      6E747300 
+ 3991              	.LASF67:
+ 3992 05fd 76616C6F 		.ascii	"valores_confirmados\000"
+ 3992      7265735F 
+ 3992      636F6E66 
+ 3992      69726D61 
+ 3992      646F7300 
+ 3993              	.LASF27:
+ 3994 0611 636F756E 		.ascii	"counter_ms\000"
+ 3994      7465725F 
+ 3994      6D7300
+ 3995              	.LASF41:
+ 3996 061c 706F7462 		.ascii	"potband\000"
+ 3996      616E6400 
+ 3997              	.LASF43:
+ 3998 0624 636F7272 		.ascii	"correcto\000"
+ 3998      6563746F 
+ 3998      00
+ 3999              	.LASF22:
+ 4000 062d 4461794F 		.ascii	"DayOfYear\000"
+ 4000      66596561 
+ 4000      7200
+ 4001              	.LASF56:
+ 4002 0637 436C6176 		.ascii	"ClaveIngresada\000"
+ 4002      65496E67 
+ 4002      72657361 
+ 4002      646100
+ 4003              	.LASF117:
+ARM GAS  C:\Users\ADMH2\AppData\Local\Temp\ccVFDBrt.s 			page 87
+
+
+ 4004 0646 6D61696E 		.ascii	"main\000"
+ 4004      00
+ 4005              	.LASF82:
+ 4006 064b 626F7431 		.ascii	"bot1\000"
+ 4006      00
+ 4007              	.LASF88:
+ 4008 0650 50574D5F 		.ascii	"PWM_WriteCompare\000"
+ 4008      57726974 
+ 4008      65436F6D 
+ 4008      70617265 
+ 4008      00
+ 4009              	.LASF111:
+ 4010 0661 4144435F 		.ascii	"ADC_GetResult16\000"
+ 4010      47657452 
+ 4010      6573756C 
+ 4010      74313600 
+ 4011              	.LASF31:
+ 4012 0671 496E6772 		.ascii	"Ingresada\000"
+ 4012      65736164 
+ 4012      6100
+ 4013              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
